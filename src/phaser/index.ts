@@ -9,4 +9,7 @@ const config: Types.Core.GameConfig = {
 	scene: First,
 };
 // Inicio del juego de phaser
+
 const game = new Game(config);
+
+export { game }

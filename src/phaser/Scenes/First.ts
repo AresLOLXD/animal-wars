@@ -14,6 +14,6 @@ export class First extends Scene {
     }
     
     update(time: number, delta: number): void {
-        
+        console.table({ time, delta });
     }
 }

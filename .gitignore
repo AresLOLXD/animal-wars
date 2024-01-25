@@ -6,8 +6,6 @@ Thumbs.db
 *.sublime-project
 *.sublime-workspace
 
-package-lock.json
-
 # Node
 dist/*
 !dist/index.html

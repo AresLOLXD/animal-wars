@@ -10,5 +10,10 @@ export class First extends Scene {
     }
 
     create() {
+    
+    }
+    
+    update(time: number, delta: number): void {
+        
     }
 }

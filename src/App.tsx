@@ -1,8 +1,9 @@
-import { useState } from "react";
+import { useSyncExternalStore } from "react";
 import "./App.css";
+import { setStore, syncStore } from "./store";
 
 function App() {
-    const [count, setCount] = useState(0);
+    const test = useSyncExternalStore(...syncStore("test"));
 
     return (
         <div
@@ -15,7 +16,14 @@ function App() {
             }}
         >
             <p style={{ fontFamily: "Rye" }}>Prueba Rye</p>
-            <p style={{ fontFamily: "Sancreek" }}>Prueba Sancreek</p>
+            <p style={{ fontFamily: "Sancreek" }}>{test}</p>
+            <button
+                onClick={() => {
+                    setStore("test", `${Math.random()}`);
+                }}
+            >
+                prueba
+            </button>
         </div>
     );
 }

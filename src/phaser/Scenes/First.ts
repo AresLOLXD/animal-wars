@@ -1,18 +1,14 @@
-import { Scene } from 'phaser';
-
+import { Scene } from "phaser";
 
 export class First extends Scene {
     constructor() {
-        super('first');
+        super("first");
     }
 
-    preload() {
-    }
+    preload() {}
 
-    create() {
-    
-    }
-    
+    create() {}
+
     update(time: number, delta: number): void {
         console.table({ time, delta });
     }

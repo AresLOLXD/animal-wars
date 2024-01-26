@@ -1,13 +1,40 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Vite + React + TS</title>
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
-  </body>
+    <head>
+        <meta charset="UTF-8" />
+        <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Animal Wars</title>
+        <style>
+            @font-face {
+                font-family: "Rye";
+                font-style: normal;
+                font-weight: 500;
+                src: url("/fonts/Rye/Rye-Regular.ttf");
+            }
+
+            @font-face {
+                font-family: "Sancreek";
+                font-style: normal;
+                font-weight: 500;
+                src: url("/fonts/Sancreek/Sancreek-Regular.ttf");
+            }
+
+            #phaser-container {
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                width: 100vw;
+                height: 100vh;
+            }
+        </style>
+    </head>
+    <body>
+        <div id="root"></div>
+        <div id="phaser-container">
+            <div id="phaser-content"></div>
+        </div>
+        <script type="module" src="/src/main.tsx"></script>
+    </body>
 </html>

@@ -15,8 +15,11 @@ export class BootLoader extends Scene {
         this.load.image("capibara", "Personajes/capibara.png");
         this.load.image("husky", "Personajes/husky.png");
         this.load.image("panda", "Personajes/panda.png");
+        this.load.audio("placeholder", "Audios/placeholder.mp3")
+
 
         this.load.on(Loader.Events.PROGRESS, (value: number) => {
+            //Por si queremos poner una barra de carga
             console.log(value);
         });
         this.load.on(Loader.Events.COMPLETE, () => {

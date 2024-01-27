@@ -1,1 +1,2 @@
-export * from "./Personaje";
+export * from "./Player";
+export * from "./Simon";

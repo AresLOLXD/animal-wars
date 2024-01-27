@@ -6,7 +6,7 @@ import useGameTimer from "./hooks/useGameTimer";
 export default function () {
     const { timerValue } = useGameTimer();
 
-    const p1Score = useSyncExternalStore(...syncStore<number>("p2Score"));
+    const p1Score = useSyncExternalStore(...syncStore<number>("p1Score"));
     const p2Score = useSyncExternalStore(...syncStore<number>("p2Score"));
 
     return (

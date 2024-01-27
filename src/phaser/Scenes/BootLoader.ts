@@ -25,7 +25,10 @@ export class BootLoader extends Scene {
             frameHeight: 600,
         });
 
-        this.load.audio("placeholder", "Audios/placeholder.mp3");
+        this.load.audio("animal_up", "Audios/Animal_Arr.mp3");
+        this.load.audio("animal_down", "Audios/Animal_Aba.mp3");
+        this.load.audio("animal_left", "Audios/Animal_Izq.mp3");
+        this.load.audio("animal_right", "Audios/Animal_Der.mp3");
 
         this.load.on(Loader.Events.PROGRESS, (value: number) => {
             //Por si queremos poner una barra de carga

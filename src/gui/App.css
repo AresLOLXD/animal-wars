@@ -8,9 +8,10 @@ body {
 }
 
 button {
-    border: none;
+    border: 10px solid #CC000C;
+    border-radius: 10px;
     outline: none;
-    background-color: none;
+    background-color: #FDED6E;
     box-shadow: none;
     font-size: 16px;
 }

@@ -1,3 +1,3 @@
 export * from "./BootLoader"
 export * from "./MainMenu"
-export * from "./SimonDice"
+export * from "./SimonSays"

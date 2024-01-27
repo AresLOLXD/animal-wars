@@ -1,12 +1,35 @@
 import "@gui/App.css";
-import PrimaryButton from "@gui/PrimaryButton";
+import MainMenu from "@gui/routes/MainMenu";
+import Minijuego from "@gui/routes/Minijuego";
+import Root from "@gui/routes/Root";
+import MinijuegoIndex from "@gui/routes/minijuego/Index";
 import "normalize.css/normalize.css";
-import { useSyncExternalStore } from "react";
-import { syncStore } from "./store";
+import { RouterProvider, createHashRouter } from "react-router-dom";
+
+const router = createHashRouter([
+    {
+        path: "/",
+        element: <Root />,
+        children: [
+            {
+                path: "mainmenu",
+                element: <MainMenu />,
+            },
+            {
+                path: "minijuego",
+                element: <Minijuego />,
+                children: [
+                    {
+                        index: true,
+                        element: <MinijuegoIndex />,
+                    },
+                ],
+            },
+        ],
+    },
+]);
 
 function App() {
-    const test = useSyncExternalStore(...syncStore("test"));
-
     return (
         <div
             style={{
@@ -15,16 +38,13 @@ function App() {
                 height: "100vh",
                 top: 0,
                 left: 0,
-                justifyContent: "center",
-                alignItems: "center",
                 display: "flex",
                 flexDirection: "column",
-                gap: "2rem",
-                backgroundColor: "white",
+                padding: "1rem",
+                // backgroundColor: "white",
             }}
         >
-            <PrimaryButton>Jugar (2P)</PrimaryButton>
-            <button>Prueba externa</button>
+            <RouterProvider router={router} />
         </div>
     );
 }

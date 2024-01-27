@@ -1,11 +1,11 @@
 import { AUTO, Game, Types } from "phaser";
-import { BootLoader, SimonSays } from "./Scenes";
+import { BootLoader, MainMenu, SimonSays } from "./Scenes";
 
 const config: Types.Core.GameConfig = {
     type: AUTO,
     backgroundColor: "#125555",
-    width: 1440,
-    height: 1024,
+    width: 800,
+    height: 600,
     scene: [
         BootLoader,
         //TODO: Quitar el simon dice y poner el menu principal
@@ -18,7 +18,7 @@ const config: Types.Core.GameConfig = {
         arcade: {
             debug: true,
             gravity: {
-                y: 9.81,
+                y: 9.81
             },
         },
     },

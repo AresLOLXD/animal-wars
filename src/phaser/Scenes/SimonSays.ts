@@ -9,7 +9,7 @@ import {
     calculateLogarithmTime,
 } from "@phaser/Util";
 import { getStore } from "@store/index";
-import { Input, Math as MathP, Scene } from "phaser";
+import { Input, Math as MathP, Scene, Animations } from "phaser";
 
 enum Values {
     UP = "Arriba",
@@ -78,7 +78,7 @@ export class SimonSays extends Scene {
             this,
             this.player_one_positionX,
             this.half_height,
-            getStore("p1Asset")
+            getStore<string>("p1Asset")
         );
         this.player_one.setFlipX(true);
         this.player_one.setScale(SCALE_FACTOR);
@@ -87,7 +87,7 @@ export class SimonSays extends Scene {
             this,
             this.player_two_positionX,
             this.half_height,
-            getStore("p2Asset")
+            getStore<string>("p2Asset")
         );
         this.player_two.setScale(SCALE_FACTOR);
 
@@ -120,6 +120,17 @@ export class SimonSays extends Scene {
         this.time.delayedCall(1000, () => {
             this.state = States.SimonTurn;
         });
+
+        this.drawPermanentText(
+            getStore<string>("p1Name"),
+            this.player_one_positionX,
+            this.player_one!.y - 300
+        );
+        this.drawPermanentText(
+            getStore<string>("p2Name"),
+            this.player_two_positionX,
+            this.player_two!.y - 300
+        );
     }
 
     update() {
@@ -188,6 +199,8 @@ export class SimonSays extends Scene {
         });
     }
     simonTurn() {
+        this.player_one!.anims.play("idle", true);
+        this.player_two!.anims.play("idle", true);
         const newValue = this.getRandomValue();
         this.simonSaysValues.push(newValue);
         const simon_time = calculateLogarithmTime(
@@ -228,6 +241,7 @@ export class SimonSays extends Scene {
                     this.simonSaysValues.length,
                     TIME_SIMON_SAYS_PLAYER
                 ) * this.simonSaysValues.length;
+            console.log("Player Time: ", player_time);
             this.time.delayedCall(player_time, () => {
                 this.listen_player_one_keys = false;
                 this.listen_player_two_keys = false;
@@ -289,6 +303,12 @@ export class SimonSays extends Scene {
                     TIME_CHECK_KEY_PRESSED
                 )
             ) {
+                this.player_one!.anims.play("jump", false).on(
+                    Animations.Events.ANIMATION_COMPLETE,
+                    () => {
+                        this.player_one!.anims.play("idle", true);
+                    }
+                );
                 this.drawText(
                     "Arriba",
                     this.player_one_positionX,
@@ -302,6 +322,12 @@ export class SimonSays extends Scene {
                     TIME_CHECK_KEY_PRESSED
                 )
             ) {
+                this.player_one!.anims.play("crouch", false).on(
+                    Animations.Events.ANIMATION_COMPLETE,
+                    () => {
+                        this.player_one!.anims.play("idle", true);
+                    }
+                );
                 this.drawText(
                     "Abajo",
                     this.player_one_positionX,
@@ -315,6 +341,20 @@ export class SimonSays extends Scene {
                     TIME_CHECK_KEY_PRESSED
                 )
             ) {
+                if (this.player_one!.flipX) {
+                    console.log("Flip");
+                    this.player_one!.setFlipX(false);
+                }
+                this.player_one!.anims.play("left", false).on(
+                    Animations.Events.ANIMATION_COMPLETE,
+                    () => {
+                        if (!this.player_one!.flipX) {
+                            console.log("Reflip");
+                            this.player_one!.setFlipX(true);
+                        }
+                        this.player_one!.anims.play("idle", true);
+                    }
+                );
                 this.drawText(
                     "Izquierda",
                     this.player_one_positionX,
@@ -328,6 +368,12 @@ export class SimonSays extends Scene {
                     TIME_CHECK_KEY_PRESSED
                 )
             ) {
+                this.player_one!.anims.play("left", false).on(
+                    Animations.Events.ANIMATION_COMPLETE,
+                    () => {
+                        this.player_one!.anims.play("idle", true);
+                    }
+                );
                 this.drawText(
                     "Derecha",
                     this.player_one_positionX,
@@ -344,6 +390,12 @@ export class SimonSays extends Scene {
                     TIME_CHECK_KEY_PRESSED
                 )
             ) {
+                this.player_two!.anims.play("jump", false).on(
+                    Animations.Events.ANIMATION_COMPLETE,
+                    () => {
+                        this.player_two!.anims.play("idle", true);
+                    }
+                );
                 this.drawText(
                     "Arriba",
                     this.player_two_positionX,
@@ -357,6 +409,12 @@ export class SimonSays extends Scene {
                     TIME_CHECK_KEY_PRESSED
                 )
             ) {
+                this.player_two!.anims.play("crouch", false).on(
+                    Animations.Events.ANIMATION_COMPLETE,
+                    () => {
+                        this.player_two!.anims.play("idle", true);
+                    }
+                );
                 this.drawText(
                     "Abajo",
                     this.player_two_positionX,
@@ -370,6 +428,12 @@ export class SimonSays extends Scene {
                     TIME_CHECK_KEY_PRESSED
                 )
             ) {
+                this.player_two!.anims.play("left", false).on(
+                    Animations.Events.ANIMATION_COMPLETE,
+                    () => {
+                        this.player_two!.anims.play("idle", true);
+                    }
+                );
                 this.drawText(
                     "Izquierda",
                     this.player_two_positionX,
@@ -383,6 +447,20 @@ export class SimonSays extends Scene {
                     TIME_CHECK_KEY_PRESSED
                 )
             ) {
+                if (!this.player_two!.flipX) {
+                    console.log("Flip");
+                    this.player_two!.setFlipX(true);
+                }
+                this.player_two!.anims.play("left", false).on(
+                    Animations.Events.ANIMATION_COMPLETE,
+                    () => {
+                        if (this.player_two!.flipX) {
+                            console.log("Reflip");
+                            this.player_two!.setFlipX(false);
+                        }
+                        this.player_two!.anims.play("idle", true);
+                    }
+                );
                 this.drawText(
                     "Derecha",
                     this.player_two_positionX,
@@ -411,6 +489,14 @@ export class SimonSays extends Scene {
         this.time.delayedCall(time, () => {
             text_object.destroy();
         });
+    }
+
+    drawPermanentText(text: string, x: number, y: number) {
+        const text_object = this.add.text(x, y, text, {
+            fontSize: "40px",
+            color: "#000000",
+        });
+        text_object.setOrigin(0.5);
     }
 
     drawValue(value: Values, x: number, y: number, time: number) {

@@ -35,13 +35,7 @@ export default function () {
     }, [timerState]);
 
     useEffect(() => {
-        const timeout = setInterval(() => {
-            setStore("timerTiempoMaximo", 4000);
-            setStore("timerState", TimerState.Start);
-        }, 10000);
-
         return () => {
-            clearInterval(timeout);
             clearInterval(interval.current);
         };
     }, []);

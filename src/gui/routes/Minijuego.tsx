@@ -1,6 +1,6 @@
 import { TimerState } from "@store/defaultStore";
-import { syncStore } from "@store/index";
-import { useEffect, useSyncExternalStore } from "react";
+import { setStore, syncStore } from "@store/index";
+import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { Outlet } from "react-router-dom";
 import BarraProbabilidad from "./minijuego/components/BarraProbabilidad";
 export default function () {
@@ -8,18 +8,43 @@ export default function () {
         ...syncStore<number>("timerTiempoMaximo")
     );
     const timerState = useSyncExternalStore(...syncStore<string>("timerState"));
+    const [timerValue, setTimerValue] = useState(0);
+    const interval = useRef<any>(-1);
 
     useEffect(() => {
-        let interval: any;
+        if (timerState === TimerState.Start) {
+            setStore("timerState", TimerState.Active);
+            setTimerValue(timerMax);
+            interval.current = setInterval(() => {
+                setTimerValue((v) => {
+                    const newVal = v - 100;
 
-        if (timerState === TimerState.Active) {
-            clearInterval(interval);
+                    if (v <= 100) {
+                        clearInterval(interval.current);
+                        setTimeout(() => {
+                            setStore("timerState", TimerState.Stop);
+                        }, 80);
+                    }
+
+                    return newVal;
+                });
+            }, 100);
         }
 
+        return () => {};
+    }, [timerState]);
+
+    useEffect(() => {
+        const timeout = setInterval(() => {
+            setStore("timerTiempoMaximo", 4000);
+            setStore("timerState", TimerState.Start);
+        }, 10000);
+
         return () => {
-            clearInterval(interval);
+            clearInterval(timeout);
+            clearInterval(interval.current);
         };
-    }, [timerState, timerMax]);
+    }, []);
 
     return (
         <div
@@ -32,6 +57,7 @@ export default function () {
             }}
         >
             <div>
+                {timerValue}
                 <Outlet />
             </div>
             <div

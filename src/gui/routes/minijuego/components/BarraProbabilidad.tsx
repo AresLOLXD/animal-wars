@@ -6,7 +6,6 @@ export default function ({ reverse }: { reverse?: boolean }) {
     const [falloCritico, setFalloCritico] = useState(0.2);
     const [fallo, setFallo] = useState(0.5);
     const [acierto, setAcierto] = useState(0.3);
-    const [stopBar, setStopBar] = useState(false);
 
     const x = useMotionValue(0);
 

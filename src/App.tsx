@@ -1,6 +1,6 @@
+import Boton from "@gui/Boton";
 import { useSyncExternalStore } from "react";
-import "./App.css";
-import { setStore, syncStore } from "./store";
+import { syncStore } from "./store";
 
 function App() {
     const test = useSyncExternalStore(...syncStore("test"));
@@ -15,15 +15,7 @@ function App() {
                 left: 0,
             }}
         >
-            <p style={{ fontFamily: "Rye" }}>Prueba Rye</p>
-            <p style={{ fontFamily: "Sancreek" }}>{test}</p>
-            <button
-                onClick={() => {
-                    setStore("test", `${Math.random()}`);
-                }}
-            >
-                prueba
-            </button>
+            <Boton />
         </div>
     );
 }

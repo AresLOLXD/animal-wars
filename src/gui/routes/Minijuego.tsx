@@ -24,6 +24,8 @@ export default function () {
                         setTimeout(() => {
                             setStore("timerState", TimerState.Stop);
                         }, 80);
+
+                        return 0;
                     }
 
                     return newVal;

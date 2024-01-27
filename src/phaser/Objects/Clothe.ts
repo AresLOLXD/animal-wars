@@ -1,5 +1,5 @@
 import { GameObjects } from "phaser";
-export class Clothe extends GameObjects.Sprite {
+export class Garment extends GameObjects.Sprite {
     constructor(scene: Phaser.Scene, x: number, y: number, texture: string) {
         super(scene, x, y, texture);
         scene.add.existing(this);

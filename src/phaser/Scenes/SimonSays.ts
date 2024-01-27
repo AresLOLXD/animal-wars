@@ -64,7 +64,15 @@ export class SimonSays extends Scene {
     score_player_one: number = 0;
     score_player_two: number = 0;
 
+    times_player_one: number = 0;
+    times_player_two: number = 0;
+
     rounds_played: number = 0;
+    rounds_played_text: Phaser.GameObjects.Text | null = null;
+
+    timeLeft: number = 0;
+    points_player_one_text: Phaser.GameObjects.Text | null = null;
+    points_player_two_text: Phaser.GameObjects.Text | null = null;
 
     constructor() {
         super({
@@ -118,7 +126,50 @@ export class SimonSays extends Scene {
             left: Input.Keyboard.KeyCodes.LEFT,
             right: Input.Keyboard.KeyCodes.RIGHT,
         }) as unknown as KeysPlayer;
+
+        this.points_player_one_text = this.add.text(
+            this.player_one_positionX,
+            this.player_one!.y + 150,
+            "Puntos: 0",
+            {
+                fontSize: "20px",
+                color: "#000000",
+            }
+        );
+        this.points_player_one_text.setOrigin(0.5);
+
+        this.points_player_two_text = this.add.text(
+            this.player_two_positionX,
+            this.player_two!.y + 150,
+            "Puntos: 0",
+            {
+                fontSize: "20px",
+                color: "#000000",
+            }
+        );
+        this.points_player_two_text.setOrigin(0.5);
+
+        this.rounds_played_text = this.add.text(
+            this.half_width + 150,
+            this.half_height - 200,
+            "Ronda: 0",
+            {
+                fontSize: "20px",
+                color: "#000000",
+            }
+        );
+        this.rounds_played_text.setOrigin(0.5);
     }
+
+    redrawTextPoints() {
+        this.points_player_one_text!.setText(
+            `Puntos: ${this.score_player_one}`
+        );
+        this.points_player_two_text!.setText(
+            `Puntos: ${this.score_player_two}`
+        );
+    }
+
     create() {
         console.log("Create SimonDice");
         this.add.existing(this.player_one!);
@@ -140,6 +191,7 @@ export class SimonSays extends Scene {
     }
 
     update() {
+        this.redrawTextPoints();
         switch (this.state) {
             case States.SimonTurn:
                 this.simonTurn();
@@ -175,6 +227,15 @@ export class SimonSays extends Scene {
         console.log("Player Time: ", player_time);
         setStore("timerTiempoMaximo", player_time);
         setStore("timerState", TimerState.Start);
+        const removeSubscriptionTimer = subscribeStore(
+            "timerValue",
+            (valueSubscription?: number) => {
+                this.timeLeft = valueSubscription ?? 0;
+                if (valueSubscription === 0) {
+                    removeSubscriptionTimer();
+                }
+            }
+        );
         const removeSubscription = subscribeStore(
             "timerState",
             (valueSubscription?: TimerState) => {
@@ -193,6 +254,11 @@ export class SimonSays extends Scene {
             }
         );
     }
+
+    restartSimonSaysValues() {
+        this.simonSaysValues = [];
+    }
+
     evaluateTurn() {
         this.state = States.PostEvaluateTurn;
         this.time.delayedCall(1000, () => {
@@ -212,7 +278,17 @@ export class SimonSays extends Scene {
                     this.half_height,
                     1000
                 );
+                if (this.simonSaysValues.length % 3 === 0) {
+                    if (this.times_player_one > this.times_player_two) {
+                        this.score_player_one++;
+                    } else if (this.times_player_one < this.times_player_two) {
+                        this.score_player_two++;
+                    }
+                }
             } else if (player_one_correct) {
+                this.score_player_one++;
+                this.score_player_two--;
+                this.restartSimonSaysValues();
                 this.drawText(
                     "Gano el jugador 1",
                     this.half_width,
@@ -220,6 +296,9 @@ export class SimonSays extends Scene {
                     1000
                 );
             } else if (player_two_correct) {
+                this.score_player_two++;
+                this.score_player_one--;
+                this.restartSimonSaysValues();
                 this.drawText(
                     "Gano el jugador 2",
                     this.half_width,
@@ -227,6 +306,9 @@ export class SimonSays extends Scene {
                     1000
                 );
             } else {
+                this.score_player_one--;
+                this.score_player_two--;
+                this.restartSimonSaysValues();
                 this.drawText(
                     "Perdieron los dos",
                     this.half_width,
@@ -235,7 +317,11 @@ export class SimonSays extends Scene {
                 );
             }
             this.time.delayedCall(1000, () => {
-                this.state = States.SimonTurn;
+                if (this.rounds_played % 9 === 0) {
+                    this.state = States.CriticalTurn;
+                } else {
+                    this.state = States.SimonTurn;
+                }
             });
         });
     }
@@ -290,6 +376,10 @@ export class SimonSays extends Scene {
         }
     }
 
+    redrawRoundsPlayed() {
+        this.rounds_played_text!.setText(`Ronda: ${this.rounds_played}`);
+    }
+
     simonTurn() {
         this.player_one!.anims.play("idle", true);
         this.player_two!.anims.play("idle", true);
@@ -297,6 +387,7 @@ export class SimonSays extends Scene {
         const newValue = this.getRandomValue();
         this.simonSaysValues.push(newValue);
         this.rounds_played++;
+        this.redrawRoundsPlayed();
         const simon_time = calculateLogarithmTime(
             this.simonSaysValues.length,
             TIME_SIMON_SAYS
@@ -361,9 +452,11 @@ export class SimonSays extends Scene {
 
         if (this.player_one_values.length === this.simonSaysValues.length) {
             this.listen_player_one_keys = false;
+            this.times_player_one += this.timeLeft;
         }
         if (this.player_two_values.length === this.simonSaysValues.length) {
             this.listen_player_two_keys = false;
+            this.times_player_two += this.timeLeft;
         }
     }
 

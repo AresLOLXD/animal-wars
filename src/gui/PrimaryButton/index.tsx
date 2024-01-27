@@ -34,7 +34,6 @@ export default function PrimaryButton({
                     position: "relative",
                     zIndex: 3,
                     outline: "solid 1px black",
-                    boxShadow: "0px 0px 26px -1px #D4B20B",
                 }}
             >
                 <motion.div

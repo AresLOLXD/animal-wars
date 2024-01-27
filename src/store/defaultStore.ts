@@ -2,6 +2,12 @@ export type Store = typeof defaultStore;
 const defaultStore = {
     test: "Test",
 
+    // Valores del juego
+    escenaActual: "SimonSays",
+
+    // Valores del minijuego
+    timerTiempoMaximo: 5,
+
     // Valores de personajes
     // P1
     p1Name: "P1",

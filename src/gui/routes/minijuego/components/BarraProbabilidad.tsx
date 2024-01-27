@@ -1,22 +1,65 @@
 import { motion, useMotionValue, useMotionValueEvent } from "framer-motion";
 import { useEffect, useState } from "react";
 
-export default function ({ reverse }: { reverse?: boolean }) {
+const defaultSpeed = 0.2;
+export enum DefaultProbs {
+    Critico = 50,
+    Fallo = 30,
+    Acierto = 20,
+}
+
+export default function ({
+    reverse,
+    score,
+}: {
+    reverse?: boolean;
+    score: number;
+}) {
     const [barWidth, setBarWidth] = useState(400);
-    const [falloCritico, setFalloCritico] = useState(0.2); // 50
-    const [fallo, setFallo] = useState(0.5); // 30
-    const [acierto, setAcierto] = useState(0.3); // 20
+    const [speed, setSpeed] = useState(defaultSpeed + score * 0.015);
+    const [[falloCritico, acierto], setProbabilidades] = useState([50, 20]);
+    const totalProbabilidades = falloCritico + DefaultProbs.Fallo + acierto;
+    const porcentajeFalloCritico = falloCritico / (2 * totalProbabilidades);
+    const porcentajeFallo = DefaultProbs.Fallo / (2 * totalProbabilidades);
+    const porcentajeAcierto = acierto / totalProbabilidades;
 
     const x = useMotionValue(0);
 
     useMotionValueEvent(x, "change", (latest) => {
         if (latest > barWidth / 2) {
-            x.stop();
-            console.log("STOP", latest);
+            // x.stop();
+            // console.log("STOP", latest);
         }
     });
 
-    useEffect(() => {}, []);
+    useEffect(() => {
+        if (score <= 3 || score >= -3) {
+            if (score < 0) {
+                setProbabilidades([
+                    DefaultProbs.Critico * ((score - 1) * -1),
+                    DefaultProbs.Acierto,
+                ]);
+                return;
+            }
+
+            if (score > 0) {
+                setProbabilidades([
+                    DefaultProbs.Critico,
+                    DefaultProbs.Acierto * (score + 1),
+                ]);
+                return;
+            }
+
+            setProbabilidades([DefaultProbs.Critico, DefaultProbs.Acierto]);
+            return;
+        }
+
+        console.log("BAR SPEED", defaultSpeed + score * 10);
+        const newSpeed = defaultSpeed + score * 10;
+        setSpeed(newSpeed <= 0 ? 0.1 : newSpeed);
+    }, [score]);
+
+    console.log("BAR SPEED RENDER", defaultSpeed);
 
     return (
         <>
@@ -46,13 +89,14 @@ export default function ({ reverse }: { reverse?: boolean }) {
                     }}
                     animate={{
                         x: reverse ? -barWidth : barWidth,
-                    }}
-                    transition={{
-                        duration: 2,
-                        repeat: Infinity,
-                        repeatType: "reverse",
-                        repeatDelay: 0.237,
-                        ease: "linear",
+                        transition: {
+                            duration: speed,
+                            repeat: Infinity,
+                            type: "tween",
+                            repeatType: "reverse",
+                            repeatDelay: 0.237,
+                            ease: "linear",
+                        },
                     }}
                 ></motion.div>
                 <motion.div
@@ -62,10 +106,12 @@ export default function ({ reverse }: { reverse?: boolean }) {
                         zIndex: 1,
                     }}
                     animate={{
-                        width: barWidth * falloCritico,
+                        width: barWidth * porcentajeFalloCritico,
                     }}
                     transition={{ type: "spring" }}
-                ></motion.div>
+                >
+                    critico
+                </motion.div>
                 <motion.div
                     style={{
                         height: "100%",
@@ -73,10 +119,12 @@ export default function ({ reverse }: { reverse?: boolean }) {
                         zIndex: 1,
                     }}
                     animate={{
-                        width: barWidth * fallo,
+                        width: barWidth * porcentajeFallo,
                     }}
                     transition={{ type: "spring" }}
-                ></motion.div>
+                >
+                    fallo
+                </motion.div>
                 <motion.div
                     style={{
                         height: "100%",
@@ -85,10 +133,38 @@ export default function ({ reverse }: { reverse?: boolean }) {
                         zIndex: 1,
                     }}
                     animate={{
-                        width: barWidth * acierto,
+                        width: barWidth * porcentajeAcierto,
                     }}
                     transition={{ type: "spring" }}
-                ></motion.div>
+                >
+                    acierto
+                </motion.div>
+                <motion.div
+                    style={{
+                        height: "100%",
+                        backgroundColor: "steelblue",
+                        zIndex: 1,
+                    }}
+                    animate={{
+                        width: barWidth * porcentajeFallo,
+                    }}
+                    transition={{ type: "spring" }}
+                >
+                    fallo
+                </motion.div>
+                <motion.div
+                    style={{
+                        height: "100%",
+                        backgroundColor: "tomato",
+                        zIndex: 1,
+                    }}
+                    animate={{
+                        width: barWidth * porcentajeFalloCritico,
+                    }}
+                    transition={{ type: "spring" }}
+                >
+                    critico
+                </motion.div>
             </motion.div>
         </>
     );

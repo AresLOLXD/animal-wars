@@ -22,9 +22,11 @@ const defaultStore = {
     // P1
     p1Name: "P1",
     p1Asset: "capibara",
+    p1Score: 0,
     // P2
     p2Name: "P2",
     p2Asset: "oso",
+    p2Score: 0,
 };
 
 export default defaultStore;

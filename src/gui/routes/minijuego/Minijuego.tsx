@@ -1,8 +1,13 @@
+import { syncStore } from "@store/index";
+import { useSyncExternalStore } from "react";
 import { Outlet } from "react-router-dom";
 import BarraProbabilidad from "./components/BarraProbabilidad";
 import useGameTimer from "./hooks/useGameTimer";
 export default function () {
     const { timerValue } = useGameTimer();
+
+    const p1Score = useSyncExternalStore(...syncStore<number>("p2Score"));
+    const p2Score = useSyncExternalStore(...syncStore<number>("p2Score"));
 
     return (
         <div
@@ -25,8 +30,8 @@ export default function () {
                     justifyContent: "space-between",
                 }}
             >
-                <BarraProbabilidad />
-                <BarraProbabilidad reverse />
+                <BarraProbabilidad score={p1Score} />
+                <BarraProbabilidad reverse score={p2Score} />
             </div>
         </div>
     );

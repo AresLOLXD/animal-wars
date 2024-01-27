@@ -4,10 +4,8 @@ import { BootLoader, MainMenu, SimonSays } from "./Scenes";
 const config: Types.Core.GameConfig = {
     type: AUTO,
     backgroundColor: "#125555",
-    max: {
-        width: 800,
-        height: 600,
-    },
+    width: 800,
+    height: 600,
     scene: [
         BootLoader,
         //TODO: Quitar el simon dice y poner el menu principal

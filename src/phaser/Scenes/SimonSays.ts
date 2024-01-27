@@ -14,10 +14,18 @@ enum States {
     SimonTurn,
     SayingTurn,
     PlayersTurn,
+    ListeningPlayer,
     EvaluateTurn,
     PostEvaluateTurn,
     CriticalTurn,
     GameOver
+}
+
+interface KeysPlayer {
+    up: Input.Keyboard.Key,
+    down: Input.Keyboard.Key,
+    left: Input.Keyboard.Key,
+    right: Input.Keyboard.Key
 }
 
 
@@ -44,8 +52,8 @@ export class SimonSays extends Scene {
     player_two_values: Values[] = [];
     listen_player_one_keys: boolean = false;
     listen_player_two_keys: boolean = false;
-    keys_player_one: object | null = null;
-    keys_player_two: object | null = null;
+    keys_player_one: KeysPlayer | null = null;
+    keys_player_two: KeysPlayer | null = null;
 
     constructor() {
         super({
@@ -81,14 +89,14 @@ export class SimonSays extends Scene {
             down: Input.Keyboard.KeyCodes.S,
             left: Input.Keyboard.KeyCodes.A,
             right: Input.Keyboard.KeyCodes.D
-        });
+        }) as unknown as KeysPlayer;
 
         this.keys_player_two = this.input.keyboard!.addKeys({
             up: Input.Keyboard.KeyCodes.UP,
             down: Input.Keyboard.KeyCodes.DOWN,
             left: Input.Keyboard.KeyCodes.LEFT,
             right: Input.Keyboard.KeyCodes.RIGHT
-        });
+        }) as unknown as KeysPlayer;
 
 
 

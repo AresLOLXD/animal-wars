@@ -13,3 +13,4 @@ export function calculateDimensions(scene: Scene) {
 export function calculateLogarithmTime(quantity: number, time: number) {
     return ((Math.log(quantity) / Math.log(LOG_BASE)) * time * -1) + time;
 }
+

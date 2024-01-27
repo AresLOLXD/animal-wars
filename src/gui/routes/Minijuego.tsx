@@ -1,39 +1,5 @@
 import { Outlet } from "react-router-dom";
-
-function Barra({ reverse }: { reverse?: boolean }) {
-    return (
-        <div
-            style={{
-                width: "400px",
-                height: "64px",
-                display: "flex",
-                flexDirection: reverse ? "row-reverse" : "row",
-            }}
-        >
-            <div
-                style={{
-                    height: "100%",
-                    width: "20%",
-                    backgroundColor: "tomato",
-                }}
-            ></div>
-            <div
-                style={{
-                    height: "100%",
-                    width: "50%",
-                    backgroundColor: "steelblue",
-                }}
-            ></div>
-            <div
-                style={{
-                    height: "100%",
-                    width: "30%",
-                    backgroundColor: "turquoise",
-                }}
-            ></div>
-        </div>
-    );
-}
+import BarraProbabilidad from "./minijuego/components/BarraProbabilidad";
 
 export default function () {
     return (
@@ -53,8 +19,8 @@ export default function () {
                     justifyContent: "space-between",
                 }}
             >
-                <Barra />
-                <Barra reverse />
+                <BarraProbabilidad />
+                <BarraProbabilidad reverse />
             </div>
             <div>
                 <Outlet />

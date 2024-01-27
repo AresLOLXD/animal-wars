@@ -26,14 +26,6 @@ export class BootLoader extends Scene {
         //this.load.image("husky", "Personajes/husky.png");
         this.load.image("panda", "Personajes/panda.png");
         this.load.audio("placeholder", "Audios/placeholder.mp3");
-        this.load.on(
-            Loader.Events.FILE_COMPLETE,
-            (key: string, type: string, data: any) => {
-                console.log(`Archivo cargado correctamente: ${key}`);
-                console.log(`Tipo de archivo: ${type}`);
-                console.log(data);
-            }
-        );
 
         this.load.on(Loader.Events.PROGRESS, (value: number) => {
             //Por si queremos poner una barra de carga

@@ -78,7 +78,7 @@ export class SimonSays extends Scene {
             this,
             this.player_one_positionX,
             this.half_height,
-            getStore("p1Asset") as string
+            getStore<string>("p1Asset")
         );
         this.player_one.setFlipX(true);
         this.player_one.setScale(SCALE_FACTOR);
@@ -87,7 +87,7 @@ export class SimonSays extends Scene {
             this,
             this.player_two_positionX,
             this.half_height,
-            getStore("p2Asset") as string
+            getStore<string>("p2Asset")
         );
         this.player_two.setScale(SCALE_FACTOR);
 
@@ -122,12 +122,12 @@ export class SimonSays extends Scene {
         });
 
         this.drawPermanentText(
-            getStore("p1Name") as string,
+            getStore<string>("p1Name"),
             this.player_one_positionX,
             this.player_one!.y - 300
         );
         this.drawPermanentText(
-            getStore("p2Name") as string,
+            getStore<string>("p2Name"),
             this.player_two_positionX,
             this.player_two!.y - 300
         );

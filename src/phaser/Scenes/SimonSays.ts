@@ -8,7 +8,8 @@ import {
     calculateDimensions,
     calculateLogarithmTime,
 } from "@phaser/Util";
-import { getStore } from "@store/index";
+import { TimerState } from "@store/defaultStore";
+import { getStore, setStore, subscribeStore } from "@store/index";
 import { Input, Math as MathP, Scene, Animations } from "phaser";
 
 enum ValueSimon {
@@ -59,6 +60,11 @@ export class SimonSays extends Scene {
     listen_player_two_keys: boolean = false;
     keys_player_one: KeysPlayer | null = null;
     keys_player_two: KeysPlayer | null = null;
+
+    score_player_one: number = 0;
+    score_player_two: number = 0;
+
+    rounds_played: number = 0;
 
     constructor() {
         super({
@@ -164,22 +170,28 @@ export class SimonSays extends Scene {
         this.listen_player_two_keys = true;
         this.drawText("Tu turno", this.half_width, this.half_height, 1000);
         const player_time =
-            calculateLogarithmTime(
-                this.simonSaysValues.length,
-                TIME_SIMON_SAYS_PLAYER
-            ) * this.simonSaysValues.length;
+            calculateLogarithmTime(this.rounds_played, TIME_SIMON_SAYS_PLAYER) *
+            this.simonSaysValues.length;
         console.log("Player Time: ", player_time);
-        this.time.delayedCall(player_time, () => {
-            this.listen_player_one_keys = false;
-            this.listen_player_two_keys = false;
-            this.state = States.EvaluateTurn;
-            this.drawText(
-                "Se acabo el tiempo",
-                this.half_width,
-                this.half_height,
-                1000
-            );
-        });
+        setStore("timerTiempoMaximo", player_time);
+        setStore("timerState", TimerState.Start);
+        const removeSubscription = subscribeStore(
+            "timerState",
+            (valueSubscription?: TimerState) => {
+                if (valueSubscription === TimerState.Stop) {
+                    this.listen_player_one_keys = false;
+                    this.listen_player_two_keys = false;
+                    this.state = States.EvaluateTurn;
+                    this.drawText(
+                        "Se acabo el tiempo",
+                        this.half_width,
+                        this.half_height,
+                        1000
+                    );
+                    removeSubscription();
+                }
+            }
+        );
     }
     evaluateTurn() {
         this.state = States.PostEvaluateTurn;
@@ -230,6 +242,9 @@ export class SimonSays extends Scene {
     playAnimSimonByValue(value: ValueSimon) {
         switch (value) {
             case ValueSimon.UP:
+                this.sound.rate = 1;
+                this.sound.play("animal_up");
+
                 this.simon!.anims.play("jump", false).on(
                     Animations.Events.ANIMATION_COMPLETE,
                     () => {
@@ -238,6 +253,7 @@ export class SimonSays extends Scene {
                 );
                 break;
             case ValueSimon.DOWN:
+                this.sound.play("animal_down");
                 this.simon!.anims.play("crouch", false).on(
                     Animations.Events.ANIMATION_COMPLETE,
                     () => {
@@ -246,6 +262,7 @@ export class SimonSays extends Scene {
                 );
                 break;
             case ValueSimon.LEFT:
+                this.sound.play("animal_left");
                 this.simon!.anims.play("left", false).on(
                     Animations.Events.ANIMATION_COMPLETE,
                     () => {
@@ -254,6 +271,7 @@ export class SimonSays extends Scene {
                 );
                 break;
             case ValueSimon.RIGHT:
+                this.sound.play("animal_right");
                 if (!this.simon!.flipX) {
                     console.log("Flip");
                     this.simon!.setFlipX(true);
@@ -278,6 +296,7 @@ export class SimonSays extends Scene {
         this.simon!.anims.play("idle", true);
         const newValue = this.getRandomValue();
         this.simonSaysValues.push(newValue);
+        this.rounds_played++;
         const simon_time = calculateLogarithmTime(
             this.simonSaysValues.length,
             TIME_SIMON_SAYS
@@ -300,7 +319,6 @@ export class SimonSays extends Scene {
                         this.half_height,
                         simon_time - 200
                     );
-                    this.sound.play("placeholder");
                     this.playAnimSimonByValue(letter);
                 },
             });

@@ -1,12 +1,16 @@
 import defaultStore, { Store } from "./defaultStore";
 
-export type StoreCallback = (value?: Store[keyof Store]) => void;
+export type StoreCallback<T extends Store[keyof Store] = Store[keyof Store]> = (
+    value?: T
+) => void;
 
 const subscribers: Partial<Record<keyof Store, Set<StoreCallback>>> = {};
 const syncedStore: Store = { ...defaultStore };
 
-const getStore = (key: keyof Store) => {
-    return syncedStore[key];
+const getStore = <T extends Store[keyof Store] = Store[keyof Store]>(
+    key: keyof Store
+) => {
+    return syncedStore[key] as T;
 };
 const setStore = <T extends keyof Store>(key: T, value: Store[T]) => {
     syncedStore[key] = value;
@@ -29,10 +33,12 @@ const subscribeStore = <T extends keyof Store>(
     };
 };
 
-const syncStore: (
+const syncStore: <T extends Store[keyof Store] = Store[keyof Store]>(
     key: keyof Store
-) => [(callback: StoreCallback) => () => void, () => Store[keyof Store]] = (
-    key
+) => [(callback: StoreCallback) => () => void, () => T] = <
+    T extends Store[keyof Store] = Store[keyof Store]
+>(
+    key: keyof Store
 ) => {
     return [
         // Subscribe
@@ -47,7 +53,7 @@ const syncStore: (
             };
         },
         // Get snapshot,
-        (): Store[keyof Store] => {
+        (): T => {
             return getStore(key);
         },
     ];

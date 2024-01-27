@@ -1,7 +1,26 @@
-import PrimaryButton from "@gui/PrimaryButton";
+import { TimerState } from "@store/defaultStore";
+import { syncStore } from "@store/index";
+import { useEffect, useSyncExternalStore } from "react";
 import { Outlet } from "react-router-dom";
 import BarraProbabilidad from "./minijuego/components/BarraProbabilidad";
 export default function () {
+    const timerMax = useSyncExternalStore(
+        ...syncStore<number>("timerTiempoMaximo")
+    );
+    const timerState = useSyncExternalStore(...syncStore<string>("timerState"));
+
+    useEffect(() => {
+        let interval: any;
+
+        if (timerState === TimerState.Active) {
+            clearInterval(interval);
+        }
+
+        return () => {
+            clearInterval(interval);
+        };
+    }, [timerState, timerMax]);
+
     return (
         <div
             style={{
@@ -12,6 +31,9 @@ export default function () {
                 height: "100%",
             }}
         >
+            <div>
+                <Outlet />
+            </div>
             <div
                 style={{
                     display: "flex",
@@ -21,10 +43,6 @@ export default function () {
             >
                 <BarraProbabilidad />
                 <BarraProbabilidad reverse />
-            </div>
-            <div>
-                <PrimaryButton>Boton</PrimaryButton>
-                <Outlet />
             </div>
         </div>
     );

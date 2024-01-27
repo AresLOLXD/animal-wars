@@ -4,7 +4,7 @@ export type StoreCallback<T extends Store[keyof Store] = Store[keyof Store]> = (
     value?: T
 ) => void;
 
-const subscribers: Partial<Record<keyof Store, Set<StoreCallback>>> = {};
+const subscribers: Partial<Record<keyof Store, Set<StoreCallback<any>>>> = {};
 const syncedStore: Store = { ...defaultStore };
 
 const getStore = <T extends Store[keyof Store] = Store[keyof Store]>(
@@ -19,9 +19,9 @@ const setStore = <T extends keyof Store>(key: T, value: Store[T]) => {
     }
 };
 
-const subscribeStore = <T extends keyof Store>(
-    key: T,
-    callback: StoreCallback
+const subscribeStore = <T extends Store[keyof Store] = Store[keyof Store]>(
+    key: keyof Store,
+    callback: StoreCallback<T>
 ) => {
     if (!subscribers[key]) {
         subscribers[key] = new Set();

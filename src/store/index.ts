@@ -1,5 +1,4 @@
-import defaultStore from "./defaultStore";
-import { Store } from "./types";
+import defaultStore, { Store } from "./defaultStore";
 
 const subscribers: Partial<Record<keyof Store, Set<() => void>>> = {};
 const syncedStore: Store = { ...defaultStore };

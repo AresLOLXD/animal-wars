@@ -1,6 +1,6 @@
-import { Store } from "./types";
-
-const defaultStore: Store = {
+export type Store = typeof defaultStore;
+const defaultStore = {
     test: "Test",
 };
+
 export default defaultStore;

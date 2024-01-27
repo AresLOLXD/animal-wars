@@ -1,6 +1,8 @@
 import defaultStore, { Store } from "./defaultStore";
 
-const subscribers: Partial<Record<keyof Store, Set<() => void>>> = {};
+export type StoreCallback = (value?: Store[keyof Store]) => void;
+
+const subscribers: Partial<Record<keyof Store, Set<StoreCallback>>> = {};
 const syncedStore: Store = { ...defaultStore };
 
 const getStore = (key: keyof Store) => {
@@ -9,20 +11,32 @@ const getStore = (key: keyof Store) => {
 const setStore = <T extends keyof Store>(key: T, value: Store[T]) => {
     syncedStore[key] = value;
     if (subscribers[key]) {
-        subscribers[key]?.forEach((callback) => callback());
+        subscribers[key]?.forEach((callback) => callback(value));
     }
 };
 
-const syncStore: <T extends keyof Store>(
-    key: T
-) => [(callback: () => void) => () => void, () => Store[T]] = <
-    T extends keyof Store
->(
-    key: T
+const subscribeStore = <T extends keyof Store>(
+    key: T,
+    callback: StoreCallback
+) => {
+    if (!subscribers[key]) {
+        subscribers[key] = new Set();
+    }
+    subscribers[key]?.add(callback);
+
+    return () => {
+        subscribers[key]?.delete(callback);
+    };
+};
+
+const syncStore: (
+    key: keyof Store
+) => [(callback: StoreCallback) => () => void, () => Store[keyof Store]] = (
+    key
 ) => {
     return [
         // Subscribe
-        (callback: () => void) => {
+        (callback: StoreCallback) => {
             if (!subscribers[key]) {
                 subscribers[key] = new Set();
             }
@@ -33,10 +47,10 @@ const syncStore: <T extends keyof Store>(
             };
         },
         // Get snapshot,
-        () => {
+        (): Store[keyof Store] => {
             return getStore(key);
         },
     ];
 };
 
-export { getStore, setStore, syncStore };
+export { getStore, setStore, subscribeStore, syncStore };

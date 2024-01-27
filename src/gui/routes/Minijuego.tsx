@@ -1,7 +1,6 @@
 import PrimaryButton from "@gui/PrimaryButton";
 import { Outlet } from "react-router-dom";
 import BarraProbabilidad from "./minijuego/components/BarraProbabilidad";
-
 export default function () {
     return (
         <div

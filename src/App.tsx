@@ -1,4 +1,6 @@
-import Boton from "@gui/Boton";
+import "@gui/App.css";
+import PrimaryButton from "@gui/PrimaryButton";
+import "normalize.css/normalize.css";
 import { useSyncExternalStore } from "react";
 import { syncStore } from "./store";
 
@@ -13,9 +15,16 @@ function App() {
                 height: "100vh",
                 top: 0,
                 left: 0,
+                justifyContent: "center",
+                alignItems: "center",
+                display: "flex",
+                flexDirection: "column",
+                gap: "2rem",
+                backgroundColor: "white",
             }}
         >
-            <Boton />
+            <PrimaryButton>Jugar (2P)</PrimaryButton>
+            <button>Prueba externa</button>
         </div>
     );
 }

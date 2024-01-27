@@ -1,0 +1,16 @@
+* {
+    transition: all 237ms ease-out;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Rye';
+}
+
+button {
+    border: none;
+    outline: none;
+    background-color: none;
+    box-shadow: none;
+    font-size: 16px;
+}

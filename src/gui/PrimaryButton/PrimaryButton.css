@@ -1,0 +1,54 @@
+:root {
+    --primary-button-border: red;
+    --primary-button-lights-off: #D4B20B;
+    --primary-button-lights-on: #F6E70C;
+}
+
+:root {
+    --mas: tomato;
+}
+
+button.Primary {
+    font-family: 'Sancreek';
+    padding: 1rem 3rem;
+    border-radius: 1.5rem;
+    outline: solid 1rem var(--primary-button-border);
+    outline-offset: -1rem;
+    border: solid 0.5rem black;
+    border-style: dotted;
+    background-color: var(--primary-button-lights-off);
+    cursor: pointer;
+    position: relative;
+}
+
+button.Primary::after {
+    content: "";
+    border-radius: inherit;
+    border: solid 0.5rem var(--primary-button-lights-off);
+    border-style: dotted;
+    position: absolute;
+    top: -0.8rem;
+    left: -0.8rem;
+    right: -0.8rem;
+    bottom: -0.8rem;
+}
+
+button.Primary::after::after {
+    content: "";
+    border-radius: inherit;
+    border: solid 0.5rem var(--primary-button-lights-off);
+    border-style: dotted;
+    position: absolute;
+    top: -0.7rem;
+    left: -0.7rem;
+    right: -0.7rem;
+    bottom: -0.7rem;
+}
+
+button.Primary:hover {
+    background-color: var(--primary-button-lights-on);
+}
+
+button.Primary:hover::after {
+    border-color: var(--primary-button-lights-on);
+}

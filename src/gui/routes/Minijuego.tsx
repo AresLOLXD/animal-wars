@@ -1,7 +1,47 @@
+import { TimerState } from "@store/defaultStore";
+import { setStore, syncStore } from "@store/index";
+import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { Outlet } from "react-router-dom";
 import BarraProbabilidad from "./minijuego/components/BarraProbabilidad";
-
 export default function () {
+    const timerMax = useSyncExternalStore(
+        ...syncStore<number>("timerTiempoMaximo")
+    );
+    const timerState = useSyncExternalStore(...syncStore<string>("timerState"));
+    const [timerValue, setTimerValue] = useState(0);
+    const interval = useRef<any>(-1);
+
+    useEffect(() => {
+        if (timerState === TimerState.Start) {
+            setStore("timerState", TimerState.Active);
+            setTimerValue(timerMax);
+            interval.current = setInterval(() => {
+                setTimerValue((v) => {
+                    const newVal = v - 100;
+
+                    if (v <= 100) {
+                        clearInterval(interval.current);
+                        setTimeout(() => {
+                            setStore("timerState", TimerState.Stop);
+                        }, 80);
+
+                        return 0;
+                    }
+
+                    return newVal;
+                });
+            }, 100);
+        }
+
+        return () => {};
+    }, [timerState]);
+
+    useEffect(() => {
+        return () => {
+            clearInterval(interval.current);
+        };
+    }, []);
+
     return (
         <div
             style={{
@@ -12,6 +52,10 @@ export default function () {
                 height: "100%",
             }}
         >
+            <div>
+                {timerValue}
+                <Outlet />
+            </div>
             <div
                 style={{
                     display: "flex",
@@ -21,9 +65,6 @@ export default function () {
             >
                 <BarraProbabilidad />
                 <BarraProbabilidad reverse />
-            </div>
-            <div>
-                <Outlet />
             </div>
         </div>
     );

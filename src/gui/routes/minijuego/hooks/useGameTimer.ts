@@ -1,8 +1,7 @@
 import { TimerState } from "@store/defaultStore";
 import { setStore, syncStore } from "@store/index";
 import { useEffect, useRef, useState, useSyncExternalStore } from "react";
-import { Outlet } from "react-router-dom";
-import BarraProbabilidad from "./minijuego/components/BarraProbabilidad";
+
 export default function () {
     const timerMax = useSyncExternalStore(
         ...syncStore<number>("timerTiempoMaximo")
@@ -15,6 +14,7 @@ export default function () {
         if (timerState === TimerState.Start) {
             setStore("timerState", TimerState.Active);
             setTimerValue(timerMax);
+            setStore("timerValue", timerMax);
             interval.current = setInterval(() => {
                 setTimerValue((v) => {
                     const newVal = v - 100;
@@ -25,9 +25,11 @@ export default function () {
                             setStore("timerState", TimerState.Stop);
                         }, 80);
 
+                        setStore("timerValue", newVal);
                         return 0;
                     }
 
+                    setStore("timerValue", newVal);
                     return newVal;
                 });
             }, 100);
@@ -42,30 +44,5 @@ export default function () {
         };
     }, []);
 
-    return (
-        <div
-            style={{
-                display: "flex",
-                flexDirection: "column",
-                justifyContent: "space-between",
-                width: "100%",
-                height: "100%",
-            }}
-        >
-            <div>
-                {timerValue}
-                <Outlet />
-            </div>
-            <div
-                style={{
-                    display: "flex",
-                    flexDirection: "row",
-                    justifyContent: "space-between",
-                }}
-            >
-                <BarraProbabilidad />
-                <BarraProbabilidad reverse />
-            </div>
-        </div>
-    );
+    return { timerValue };
 }

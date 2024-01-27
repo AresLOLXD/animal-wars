@@ -3,9 +3,9 @@ import { useEffect, useState } from "react";
 
 export default function ({ reverse }: { reverse?: boolean }) {
     const [barWidth, setBarWidth] = useState(400);
-    const [falloCritico, setFalloCritico] = useState(0.2);
-    const [fallo, setFallo] = useState(0.5);
-    const [acierto, setAcierto] = useState(0.3);
+    const [falloCritico, setFalloCritico] = useState(0.2); // 50
+    const [fallo, setFallo] = useState(0.5); // 30
+    const [acierto, setAcierto] = useState(0.3); // 20
 
     const x = useMotionValue(0);
 

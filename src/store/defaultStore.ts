@@ -16,6 +16,7 @@ const defaultStore = {
     // Valores del minijuego
     timerTiempoMaximo: 5000,
     timerState: TimerState.Idle,
+    timerValue: 0,
 
     // Valores de personajes
     // P1

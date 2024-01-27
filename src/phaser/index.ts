@@ -1,5 +1,5 @@
 import { AUTO, Game, Types } from "phaser";
-import { BootLoader, MainMenu } from "./Scenes";
+import { BootLoader, MainMenu, SimonDice } from "./Scenes";
 
 const config: Types.Core.GameConfig = {
     type: AUTO,
@@ -10,7 +10,9 @@ const config: Types.Core.GameConfig = {
     },
     scene: [
         BootLoader,
-        MainMenu,
+        //TODO: Quitar el simon dice y poner el menu principal
+        //MainMenu,
+        SimonDice,
     ],
     parent: "phaser-content",
 };

@@ -7,7 +7,7 @@ export class MainMenu extends Scene {
         });
     }
     preload() {
-        
+
     }
     create() {
 

@@ -1,6 +1,7 @@
 import "@gui/App.css";
 import MainMenu from "@gui/routes/MainMenu";
 import Minijuego from "@gui/routes/Minijuego";
+import Modal from "@gui/routes/Modal";
 import Root from "@gui/routes/Root";
 import MinijuegoIndex from "@gui/routes/minijuego/Index";
 import "normalize.css/normalize.css";
@@ -24,6 +25,10 @@ const router = createHashRouter([
                         element: <MinijuegoIndex />,
                     },
                 ],
+            },
+            {
+                path: "modal",
+                element: <Modal />,
             },
         ],
     },

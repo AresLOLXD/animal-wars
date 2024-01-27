@@ -16,15 +16,15 @@ export class BootLoader extends Scene {
             frameWidth: 600,
             frameHeight: 600,
         });
-        this.load.spritesheet("husky", "SpriteSheet/Oso_SS.png", {
+        this.load.spritesheet("oso", "SpriteSheet/Oso_SS.png", {
             frameWidth: 600,
             frameHeight: 600,
         });
-        this.load;
+        this.load.spritesheet("panda", "SpriteSheet/Panda_SS.png", {
+            frameWidth: 600,
+            frameHeight: 600,
+        });
 
-        //this.load.image("capibara", "Personajes/capibara.png");
-        //this.load.image("husky", "Personajes/husky.png");
-        this.load.image("panda", "Personajes/panda.png");
         this.load.audio("placeholder", "Audios/placeholder.mp3");
 
         this.load.on(Loader.Events.PROGRESS, (value: number) => {

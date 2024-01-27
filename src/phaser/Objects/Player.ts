@@ -11,7 +11,7 @@ export class Player extends GameObjects.Sprite {
                     frame: 8,
                 },
             ],
-            frameRate: 5,
+            frameRate: 10,
             repeat: -1,
         });
         this.anims.create({
@@ -23,10 +23,10 @@ export class Player extends GameObjects.Sprite {
                 },
                 {
                     key: texture,
-                    frame: 10,
+                    frame: 9,
                 },
             ],
-            frameRate: 5,
+            frameRate: 10,
             repeat: 0,
         });
         this.anims.create({
@@ -41,7 +41,7 @@ export class Player extends GameObjects.Sprite {
                     frame: 10,
                 },
             ],
-            frameRate: 5,
+            frameRate: 10,
             repeat: 0,
         });
         this.anims.create({
@@ -56,7 +56,7 @@ export class Player extends GameObjects.Sprite {
                     frame: 3,
                 },
             ],
-            frameRate: 5,
+            frameRate: 10,
             repeat: 0,
         });
     }

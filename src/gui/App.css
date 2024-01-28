@@ -6,12 +6,3 @@
 body {
     font-family: 'Rye';
 }
-
-button {
-    border: 10px solid #CC000C;
-    border-radius: 10px;
-    outline: none;
-    background-color: #FDED6E;
-    box-shadow: none;
-    font-size: 16px;
-}

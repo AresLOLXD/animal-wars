@@ -427,7 +427,10 @@ export class SPS extends Scene {
     }
 
     postEvaluate(){
+        console.log(this.score_player_one);
+        console.log(this.score_player_two);
         if( (this.score_player_one  % 3 ==0) || (this.score_player_two % 3 == 0) ){
+            
             this.state = States.CriticalTurn;
         }else {
             this.state = States.PlayersElection;

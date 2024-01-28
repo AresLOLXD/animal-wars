@@ -23,7 +23,7 @@ const defaultStore = {
     test: "Test",
 
     // Valores del juego
-    escenaActual: "SimonSays",
+    escenaActual: "BattleShip",
 
     // Valores del minijuego
     timerTiempoMaximo: 5000,

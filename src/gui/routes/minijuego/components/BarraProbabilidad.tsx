@@ -1,6 +1,6 @@
 import { BarState } from "@store/defaultStore";
 import {
-    AnimationControls,
+    MotionValue,
     motion,
     useAnimationControls,
     useMotionValue,
@@ -27,7 +27,7 @@ export default function ({
     state: BarState;
     handleChange: (
         probabilidades: MutableRefObject<number[]>,
-        controls: AnimationControls
+        controls: MotionValue<number>
     ) => (latest: number) => void;
 }) {
     const [speed, setSpeed] = useState(defaultSpeed + score * 0.015);
@@ -47,7 +47,7 @@ export default function ({
     const x = useMotionValue(0);
     const controls = useAnimationControls();
 
-    useMotionValueEvent(x, "change", handleChange(probabilidades, controls));
+    useMotionValueEvent(x, "change", handleChange(probabilidades, x));
 
     useEffect(() => {
         controls.start({

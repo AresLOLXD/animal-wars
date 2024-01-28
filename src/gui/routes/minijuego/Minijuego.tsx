@@ -42,6 +42,8 @@ export default function () {
                     state={p1BarState}
                     handleChange={(probabilidades, controls) => (latest) => {
                         if (p1BarState === BarState.Stop) {
+                            controls.stop();
+
                             const [critico, fallo, acierto] =
                                 probabilidades.current;
 
@@ -55,6 +57,15 @@ export default function () {
                             const primerAcierto = positionAcierto + primerFallo;
                             const segundoFallo = positionFallo + primerAcierto;
 
+                            console.log(
+                                "RESULTADO",
+                                latest,
+                                primerCritico,
+                                primerFallo,
+                                primerAcierto,
+                                segundoFallo
+                            );
+
                             if (latest <= primerCritico) {
                                 resultado = BarResult.Critico;
                             } else if (latest <= primerFallo) {
@@ -67,7 +78,6 @@ export default function () {
                                 resultado = BarResult.Critico;
                             }
 
-                            controls.stop();
                             setStore("p1BarResult", resultado);
                             setStore("p1BarState", BarState.Result);
                         }
@@ -79,6 +89,8 @@ export default function () {
                     state={p2BarState}
                     handleChange={(probabilidades, controls) => (latest) => {
                         if (p2BarState === BarState.Stop) {
+                            controls.stop();
+
                             const [critico, fallo, acierto] =
                                 probabilidades.current;
 
@@ -92,6 +104,15 @@ export default function () {
                             const primerAcierto = positionAcierto + primerFallo;
                             const segundoFallo = positionFallo + primerAcierto;
 
+                            console.log(
+                                "RESULTADO",
+                                latest,
+                                primerCritico,
+                                primerFallo,
+                                primerAcierto,
+                                segundoFallo
+                            );
+
                             if (latest >= primerCritico) {
                                 resultado = BarResult.Critico;
                             } else if (latest >= primerFallo) {
@@ -104,7 +125,6 @@ export default function () {
                                 resultado = BarResult.Critico;
                             }
 
-                            controls.stop();
                             setStore("p2BarResult", resultado);
                             setStore("p2BarState", BarState.Result);
                         }

@@ -12,6 +12,7 @@ export class BootLoader extends Scene {
         console.log("Cargando los recursos");
 
         this.load.path = "./src/assets/";
+        this.load.image("fondo", "Fondo/fondoProvisional.jpeg");
         this.load.spritesheet("capibara", "SpriteSheet/Capibara_SS.png", {
             frameWidth: 600,
             frameHeight: 600,

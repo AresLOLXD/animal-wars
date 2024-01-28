@@ -57,7 +57,7 @@ function App() {
                 // backgroundColor: "white",
             }}
         >
-            <div
+            <div id="phaser-background"
                 style={{
                     width: gameConfig.width,
                     height: gameConfig.height,

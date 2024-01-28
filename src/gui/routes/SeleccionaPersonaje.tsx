@@ -1,12 +1,9 @@
 import { Variants, motion } from "framer-motion";
 import styled from "styled-components";
-import { gameConfig } from "@phaser/index";
 import Oso from "@assets/Personajes/oso.png";
 import Panda from "@assets/Personajes/panda.png";
 import Capibara from "@assets/Personajes/capibara.png";
 
-let wg = Number(gameConfig.width);
-let hg = Number(gameConfig.height);
 let personajeFocus1: string;
 let personajeFocus2: string;
 
@@ -25,8 +22,6 @@ const Container = styled(motion.div)`
     flex-direction: column;
     align-items: center;
     justify-content: start;
-    width: ${wg-10}px;
-    height: ${hg-10}px;
     color: #d4b20b;
 `;
 
@@ -36,14 +31,6 @@ const Row = styled(motion.div)`
     justify-content: space-between;
     width: 100%;
     font-size: 2em;
-    margin: 5px;
-`;
-
-const Elemento = styled(motion.div)`
-    display: flex;
-    justify-content: start;
-    align-items: center;
-    width: 100%;
     margin: 5px;
 `;
 
@@ -58,6 +45,53 @@ const Column = styled(motion.div)`
     font-size: 0.5em;
     font-family: Sancreek;
 `;
+
+const TableRow = styled(motion.tr)`
+    width: 100%;
+    display:flex;
+    border-bottom:2px solid black;
+`;
+
+const TableData = styled(motion.td)`
+    width: 100%;
+    border-left:2px solid black;
+    padding:0.75rem;
+`;
+
+const tableBorder: Variants = {
+    normal: {
+        background: "#E8000E",
+        padding: "1rem",
+        borderRadius: "inherit",
+        position: "relative",
+        zIndex: 3,
+        width:"100%",
+        boxShadow: "3px 5px 0px 0px black",
+    },
+};
+
+const tableContent: Variants = {
+    normal: {
+        background: "#FDED6E",
+        //padding: "1rem 4rem",
+        borderRadius: "1rem",
+        color: "#342F2F",
+        width:"100%",
+    },
+};
+
+const tableDots: Variants = {
+    normal: {
+        position: "absolute",
+            top: "0.2rem",
+            left: "0.2rem",
+            right: "0.2rem",
+            bottom: "0.2rem",
+            borderRadius: "inherit",
+            border: "solid 0.5rem #D4B20B",
+            borderStyle: "dotted",
+    },
+};
 
 export default function Personaje() {
     return (
@@ -76,9 +110,9 @@ export default function Personaje() {
                         position:"relative",
                     }}>
                         <img src={personajeFocus1} style={{
-                        position:"absolute",
-                        width:"300px",
-                        height:"300px",
+                        //position:"absolute",
+                        width:"250px",
+                        height:"250px",
                         transform:"scaleX(-1)",
                         margin:"auto"
                     }}></img> 
@@ -87,12 +121,52 @@ export default function Personaje() {
                 <Column>{arrowRigth}</Column>
                 <Column>{arrowLeft}</Column>
                 <Column>
-                    <img src={personajeFocus2} style={{
-                        width:"300px",
-                        height:"300px"
-                    }}></img>     
+                <div style={{
+                        width:"250px",
+                        height:"250px",
+                        //overflow:"hidden",
+                        position:"relative",
+                    }}>
+                        <img src={personajeFocus2} style={{
+                        //position:"absolute",
+                        width:"250px",
+                        height:"250px",
+                        margin:"auto"
+                    }}></img> 
+                    </div>
                 </Column>
                 <Column>{arrowRigth}</Column>
+            </Row>
+            <Row initial="normal"
+            animate="normal" style={{position: "relative",
+            marginTop:"15px",
+            width:"100%",
+            borderRadius: "1.2rem",
+            fontFamily: "Sancreek",
+            fontSize: "1rem",
+            justifyContent:"center",
+            textAlign: "center",}}>
+                <motion.div variants={tableBorder}>
+                <motion.table variants={tableContent}>
+                    <TableRow >
+                        <TableData style={{
+                        borderLeft:"0",
+                    }} id="Golden">Golden</TableData>
+                        <TableData id="Oso">Oso</TableData>
+                        <TableData id="Capibara">Capibara</TableData>
+                    </TableRow>
+                    <TableRow style={{
+                        borderBottom:"0",
+                    }}>
+                        <TableData style={{
+                        borderLeft:"0",
+                    }} id="Husky">Golden (pero malo)</TableData>
+                        <TableData id="Panda">Oso (pero tinto)</TableData>
+                        <TableData id="CapibaraBlanco">Capibara (pero blanco)</TableData>
+                    </TableRow>
+                </motion.table>
+                <motion.div variants={tableDots}></motion.div>
+                </motion.div>
             </Row>
         </Container>
     );

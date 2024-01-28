@@ -16,14 +16,17 @@ const defaultStore = {
     // Valores del minijuego
     timerTiempoMaximo: 5000,
     timerState: TimerState.Idle,
+    timerValue: 0,
 
     // Valores de personajes
     // P1
     p1Name: "P1",
     p1Asset: "capibara",
+    p1Score: 0,
     // P2
     p2Name: "P2",
     p2Asset: "oso",
+    p2Score: 0,
 };
 
 export default defaultStore;

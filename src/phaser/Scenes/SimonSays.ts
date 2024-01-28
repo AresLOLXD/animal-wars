@@ -1,4 +1,4 @@
-import { Player, Simon } from "@phaser/Objects";
+import { Clothes, Garment, Player, Simon } from "@phaser/Objects";
 import {
     SCALE_FACTOR,
     TIME_CHECK_KEY_PRESSED,
@@ -64,7 +64,18 @@ export class SimonSays extends Scene {
     score_player_one: number = 0;
     score_player_two: number = 0;
 
+    times_player_one: number = 0;
+    times_player_two: number = 0;
+
     rounds_played: number = 0;
+    rounds_played_text: Phaser.GameObjects.Text | null = null;
+
+    timeLeft: number = 0;
+    points_player_one_text: Phaser.GameObjects.Text | null = null;
+    points_player_two_text: Phaser.GameObjects.Text | null = null;
+
+    clothes_player_one: Clothes[] = [];
+    clothes_player_two: Clothes[] = [];
 
     constructor() {
         super({
@@ -118,7 +129,84 @@ export class SimonSays extends Scene {
             left: Input.Keyboard.KeyCodes.LEFT,
             right: Input.Keyboard.KeyCodes.RIGHT,
         }) as unknown as KeysPlayer;
+
+        this.points_player_one_text = this.add.text(
+            this.player_one_positionX,
+            this.player_one!.y + 150,
+            "Puntos: 0",
+            {
+                fontSize: "20px",
+                color: "#000000",
+            }
+        );
+        this.points_player_one_text.setOrigin(0.5);
+
+        this.points_player_two_text = this.add.text(
+            this.player_two_positionX,
+            this.player_two!.y + 150,
+            "Puntos: 0",
+            {
+                fontSize: "20px",
+                color: "#000000",
+            }
+        );
+        this.points_player_two_text.setOrigin(0.5);
+
+        this.rounds_played_text = this.add.text(
+            this.half_width + 150,
+            this.half_height - 200,
+            "Ronda: 0",
+            {
+                fontSize: "20px",
+                color: "#000000",
+            }
+        );
+        this.rounds_played_text.setOrigin(0.5);
+
+        this.clothes_player_one = [
+            new Clothes(this, [
+                new Garment(
+                    this,
+                    this.player_one_positionX,
+                    this.player_one!.y,
+                    "pantalon_p1"
+                ),
+                new Garment(
+                    this,
+                    this.player_one_positionX,
+                    this.player_one!.y,
+                    "overol_p1"
+                ),
+            ]),
+        ];
+
+        this.clothes_player_two = [
+            new Clothes(this, [
+                new Garment(
+                    this,
+                    this.player_two_positionX,
+                    this.player_two!.y,
+                    "pantalon_p2"
+                ),
+                new Garment(
+                    this,
+                    this.player_two_positionX,
+                    this.player_two!.y,
+                    "overol_p2"
+                ),
+            ]),
+        ];
     }
+
+    redrawTextPoints() {
+        this.points_player_one_text!.setText(
+            `Puntos: ${this.score_player_one}`
+        );
+        this.points_player_two_text!.setText(
+            `Puntos: ${this.score_player_two}`
+        );
+    }
+
     create() {
         console.log("Create SimonDice");
         this.add.existing(this.player_one!);
@@ -140,6 +228,7 @@ export class SimonSays extends Scene {
     }
 
     update() {
+        this.redrawTextPoints();
         switch (this.state) {
             case States.SimonTurn:
                 this.simonTurn();
@@ -175,6 +264,15 @@ export class SimonSays extends Scene {
         console.log("Player Time: ", player_time);
         setStore("timerTiempoMaximo", player_time);
         setStore("timerState", TimerState.Start);
+        const removeSubscriptionTimer = subscribeStore(
+            "timerValue",
+            (valueSubscription?: number) => {
+                this.timeLeft = valueSubscription ?? 0;
+                if (valueSubscription === 0) {
+                    removeSubscriptionTimer();
+                }
+            }
+        );
         const removeSubscription = subscribeStore(
             "timerState",
             (valueSubscription?: TimerState) => {
@@ -193,6 +291,11 @@ export class SimonSays extends Scene {
             }
         );
     }
+
+    restartSimonSaysValues() {
+        this.simonSaysValues = [];
+    }
+
     evaluateTurn() {
         this.state = States.PostEvaluateTurn;
         this.time.delayedCall(1000, () => {
@@ -212,7 +315,17 @@ export class SimonSays extends Scene {
                     this.half_height,
                     1000
                 );
+                if (this.simonSaysValues.length % 3 === 0) {
+                    if (this.times_player_one > this.times_player_two) {
+                        this.score_player_one++;
+                    } else if (this.times_player_one < this.times_player_two) {
+                        this.score_player_two++;
+                    }
+                }
             } else if (player_one_correct) {
+                this.score_player_one++;
+                this.score_player_two--;
+                this.restartSimonSaysValues();
                 this.drawText(
                     "Gano el jugador 1",
                     this.half_width,
@@ -220,6 +333,9 @@ export class SimonSays extends Scene {
                     1000
                 );
             } else if (player_two_correct) {
+                this.score_player_two++;
+                this.score_player_one--;
+                this.restartSimonSaysValues();
                 this.drawText(
                     "Gano el jugador 2",
                     this.half_width,
@@ -227,6 +343,9 @@ export class SimonSays extends Scene {
                     1000
                 );
             } else {
+                this.score_player_one--;
+                this.score_player_two--;
+                this.restartSimonSaysValues();
                 this.drawText(
                     "Perdieron los dos",
                     this.half_width,
@@ -234,8 +353,16 @@ export class SimonSays extends Scene {
                     1000
                 );
             }
+
+            setStore("p1Score", this.score_player_one);
+            setStore("p2Score", this.score_player_two);
+
             this.time.delayedCall(1000, () => {
-                this.state = States.SimonTurn;
+                if (this.rounds_played % 9 === 0) {
+                    this.state = States.CriticalTurn;
+                } else {
+                    this.state = States.SimonTurn;
+                }
             });
         });
     }
@@ -290,6 +417,10 @@ export class SimonSays extends Scene {
         }
     }
 
+    redrawRoundsPlayed() {
+        this.rounds_played_text!.setText(`Ronda: ${this.rounds_played}`);
+    }
+
     simonTurn() {
         this.player_one!.anims.play("idle", true);
         this.player_two!.anims.play("idle", true);
@@ -297,6 +428,7 @@ export class SimonSays extends Scene {
         const newValue = this.getRandomValue();
         this.simonSaysValues.push(newValue);
         this.rounds_played++;
+        this.redrawRoundsPlayed();
         const simon_time = calculateLogarithmTime(
             this.simonSaysValues.length,
             TIME_SIMON_SAYS
@@ -361,9 +493,11 @@ export class SimonSays extends Scene {
 
         if (this.player_one_values.length === this.simonSaysValues.length) {
             this.listen_player_one_keys = false;
+            this.times_player_one += this.timeLeft;
         }
         if (this.player_two_values.length === this.simonSaysValues.length) {
             this.listen_player_two_keys = false;
+            this.times_player_two += this.timeLeft;
         }
     }
 
@@ -380,6 +514,9 @@ export class SimonSays extends Scene {
                     this.player_one!.anims.play("idle", true);
                 }
             );
+            this.clothes_player_one.forEach((clothes) => {
+                clothes.playAnimationAll("jump");
+            });
             this.drawText(
                 "Arriba",
                 this.player_one_positionX,
@@ -399,6 +536,9 @@ export class SimonSays extends Scene {
                     this.player_one!.anims.play("idle", true);
                 }
             );
+            this.clothes_player_one.forEach((clothes) => {
+                clothes.playAnimationAll("crouch");
+            });
             this.drawText(
                 "Abajo",
                 this.player_one_positionX,
@@ -468,6 +608,9 @@ export class SimonSays extends Scene {
                     this.player_two!.anims.play("idle", true);
                 }
             );
+            this.clothes_player_two.forEach((clothes) => {
+                clothes.playAnimationAll("jump");
+            });
             this.drawText(
                 "Arriba",
                 this.player_two_positionX,
@@ -487,6 +630,9 @@ export class SimonSays extends Scene {
                     this.player_two!.anims.play("idle", true);
                 }
             );
+            this.clothes_player_two.forEach((clothes) => {
+                clothes.playAnimationAll("crouch");
+            });
             this.drawText(
                 "Abajo",
                 this.player_two_positionX,
@@ -506,6 +652,9 @@ export class SimonSays extends Scene {
                     this.player_two!.anims.play("idle", true);
                 }
             );
+            this.clothes_player_two.forEach((clothes) => {
+                clothes.playAnimationAll("left");
+            });
             this.drawText(
                 "Izquierda",
                 this.player_two_positionX,
@@ -522,13 +671,22 @@ export class SimonSays extends Scene {
             if (!this.player_two!.flipX) {
                 console.log("Flip");
                 this.player_two!.setFlipX(true);
+                this.clothes_player_two.forEach((clothes) => {
+                    clothes.setFlipXAll(true);
+                });
             }
+            this.clothes_player_two.forEach((clothes) => {
+                clothes.playAnimationAll("left");
+            });
             this.player_two!.anims.play("left", false).on(
                 Animations.Events.ANIMATION_COMPLETE,
                 () => {
                     if (this.player_two!.flipX) {
                         console.log("Reflip");
                         this.player_two!.setFlipX(false);
+                        this.clothes_player_two.forEach((clothes) => {
+                            clothes.setFlipXAll(false);
+                        });
                     }
                     this.player_two!.anims.play("idle", true);
                 }
@@ -551,7 +709,16 @@ export class SimonSays extends Scene {
             this.checkPlayerTwoKeys();
         }
     }
-    criticalTurn() {}
+    criticalTurn() {
+        this.clothes_player_one.forEach((clothes) => {
+            clothes.removeAllGarments();
+        });
+        this.clothes_player_two.forEach((clothes) => {
+            clothes.removeAllGarments();
+        });
+        this.clothes_player_one.shift();
+        this.clothes_player_two.shift();
+    }
     gameOver() {}
 
     getRandomValue(): ValueSimon {

@@ -1,5 +1,4 @@
 import PrimaryButton from "@gui/PrimaryButton/index";
-import { motion } from "framer-motion";
 
 export default function () {
     return (<div style={{

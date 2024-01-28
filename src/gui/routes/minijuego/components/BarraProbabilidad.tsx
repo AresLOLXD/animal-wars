@@ -90,8 +90,6 @@ export default function ({
         setSpeed(newSpeed <= 0 ? 0.1 : newSpeed);
     }, [score]);
 
-    console.log("BAR SPEED RENDER", defaultSpeed);
-
     return (
         <>
             <motion.div

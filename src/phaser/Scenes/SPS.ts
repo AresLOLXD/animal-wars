@@ -1,4 +1,4 @@
-import { Player,Clothes } from "@phaser/Objects";
+import { Player,Clothes, Backgrounds } from "@phaser/Objects";
 import {
     calculateDimensions,
     SCALE_FACTOR,
@@ -32,6 +32,9 @@ interface KeysPlayer {
 }
 
 export class SPS extends Scene {
+
+    fondoBg : Backgrounds | null = null;
+
     player_one: Player | null = null;
     player_two: Player | null = null;
 
@@ -75,6 +78,8 @@ export class SPS extends Scene {
         [this.half_width, this.half_height, this.width, this.height] =
             calculateDimensions(this);
 
+        this.fondoBg = new Backgrounds(this,0,0,this.width,this.height,getStore<string>("fondoActual"));
+
         this.player_one_positionX = 100;
         this.player_two_positionX = this.width - 100;
         this.player_one = new Player(
@@ -114,7 +119,8 @@ export class SPS extends Scene {
             "Puntos: 0",
             {
                 fontSize: "20px",
-                color: "#000000",
+                color: "#D4B20B",
+                fontFamily: "Ryo",
             }
         );
         this.points_player_one_text.setOrigin(0.5);
@@ -125,7 +131,8 @@ export class SPS extends Scene {
             "Puntos: 0",
             {
                 fontSize: "20px",
-                color: "#000000",
+                color: "#D4B20B",
+                fontFamily: "Ryo",
             }
         );
         this.points_player_two_text.setOrigin(0.5);
@@ -133,6 +140,8 @@ export class SPS extends Scene {
 
     create() {
         console.log("Create SPS");
+        this.add.existing(this.fondoBg!);
+        
         this.add.existing(this.player_one!);
         this.add.existing(this.player_two!);
         this.time.delayedCall(1000, () => {
@@ -448,7 +457,8 @@ export class SPS extends Scene {
     drawPermanentText(text: string, x: number, y: number) {
         const text_object = this.add.text(x, y, text, {
             fontSize: "40px",
-            color: "#000000",
+            color: "#D4B20B",
+            fontFamily: "Ryo",
         });
         text_object.setOrigin(0.5);
     }
@@ -456,7 +466,8 @@ export class SPS extends Scene {
     drawText(text: string, x: number, y: number, time: number) {
         const text_object = this.add.text(x, y, text, {
             fontSize: "40px",
-            color: "#000000",
+            color: "#D4B20B",
+            fontFamily: "Ryo",
         });
         text_object.setOrigin(0.5);
         this.time.delayedCall(time, () => {

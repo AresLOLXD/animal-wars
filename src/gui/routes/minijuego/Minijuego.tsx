@@ -69,7 +69,7 @@ export default function () {
 
                             controls.stop();
                             setStore("p1BarResult", resultado);
-                            setStore("p2BarState", BarState.Result);
+                            setStore("p1BarState", BarState.Result);
                         }
                     }}
                 />

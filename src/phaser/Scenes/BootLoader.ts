@@ -12,6 +12,7 @@ export class BootLoader extends Scene {
         console.log("Cargando los recursos");
 
         this.load.path = "./src/assets/";
+        this.load.image("fondo", "Fondo/fondoProvisional.jpeg");
         this.load.spritesheet("capibara", "SpriteSheet/Capibara_SS.png", {
             frameWidth: 600,
             frameHeight: 600,
@@ -52,6 +53,11 @@ export class BootLoader extends Scene {
         this.load.spritesheet("overol_p2", "SpriteSheet/SuperiorRojo_SS.png", {
             frameWidth: 600,
             frameHeight: 600,
+        });
+
+        this.load.spritesheet("pays", "SpriteSheet/Pays_SS.png",{
+            frameWidth: 300,
+            frameHeight: 300
         });
 
         this.load.audio("animal_up", "Audios/Animal_Arr.mp3");

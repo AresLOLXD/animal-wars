@@ -1,4 +1,4 @@
-import { Clothes, Garment, Player} from "@phaser/Objects";
+import { Clothes, Garment, Player, Backgrounds} from "@phaser/Objects";
 import {
     SCALE_FACTOR,
     TIME_BATLLE_SHIP_PLAYER,
@@ -21,9 +21,9 @@ enum Positions {
 }
 
 enum States {
+    Beggining,
     TurnStart,
-    Defending,
-    Attacking,
+    PlayerTurn,
     Selecting,
     EvaluateTurn,
     PostEvaluateTurn,
@@ -39,6 +39,9 @@ interface KeysPlayer {
 }
 
 export class BattleShip extends Scene {
+
+    fondoBg : Backgrounds | null = null;
+
     player_one: Player | null = null;
     player_two: Player | null = null;
 
@@ -50,7 +53,7 @@ export class BattleShip extends Scene {
     player_one_positionX: number = 0;
     player_two_positionX: number = 0;
 
-    state: States = States.TurnStart;
+    state: States = States.Beggining;
 
     player_one_positions: boolean[] = [true, true, true, true];
     player_one_defend: Positions = Positions.NONE;
@@ -90,6 +93,8 @@ export class BattleShip extends Scene {
 
         [this.half_width, this.half_height, this.width, this.height] =
             calculateDimensions(this);
+
+        this.fondoBg = new Backgrounds(this,0,0,this.width,this.height,getStore<string>("fondoActual"));
 
         this.player_one_positionX = 100;
         this.player_two_positionX = this.width - 100;
@@ -132,7 +137,8 @@ export class BattleShip extends Scene {
             "Puntos: 0",
             {
                 fontSize: "20px",
-                color: "#000000",
+                color: "#D4B20B",
+                fontFamily: "Ryo",
             }
         );
         this.points_player_one_text.setOrigin(0.5);
@@ -143,7 +149,8 @@ export class BattleShip extends Scene {
             "Puntos: 0",
             {
                 fontSize: "20px",
-                color: "#000000",
+                color: "#D4B20B",
+                fontFamily: "Ryo",
             }
         );
         this.points_player_two_text.setOrigin(0.5);
@@ -154,7 +161,8 @@ export class BattleShip extends Scene {
             "Ronda: 0",
             {
                 fontSize: "20px",
-                color: "#000000",
+                color: "#D4B20B",
+                fontFamily: "Ryo",
             }
         );
         this.rounds_played_text.setOrigin(0.5);
@@ -204,7 +212,9 @@ export class BattleShip extends Scene {
     }
 
     create() {
-        console.log("Create BattleShip");
+
+        this.add.existing(this.fondoBg!);
+
         this.add.existing(this.player_one!);
         this.add.existing(this.player_two!);
         this.time.delayedCall(1000, () => {
@@ -229,11 +239,11 @@ export class BattleShip extends Scene {
             case States.TurnStart:
                 this.turnStart();
                 break;
-            case States.Attacking:
-                this.attacking();
+            case States.Selecting:
+                this.listenPlayers();
                 break;
-            case States.Defending:
-                this.defending();
+            case States.PlayerTurn:
+                this.playerTurn();
                 break;
             case States.EvaluateTurn:
                 this.evaluateTurn();
@@ -248,8 +258,8 @@ export class BattleShip extends Scene {
     }
 
     turnStart() {
+        this.state = States.PlayerTurn;
         console.log("Inicio de turno");
-        this.state = States.Defending;
         this.player_one_attack = Positions.NONE;
         this.player_one_defend = Positions.NONE;
         this.player_two_attack = Positions.NONE;
@@ -259,41 +269,8 @@ export class BattleShip extends Scene {
         this.drawText("Elige tu casilla para defender", this.half_width, this.half_height, 1000);
     }
 
-    defending(){
-        this.state = States.Selecting;
-        const player_time = 5000;
-            //calculateLogarithmTime(this.rounds_played + 1, TIME_BATLLE_SHIP_PLAYER) 
-        console.log("Player Time: ", player_time);
-        setStore("timerTiempoMaximo", player_time);
-        setStore("timerState", TimerState.Start);
-        const removeSubscriptionTimer = subscribeStore(
-            "timerValue",
-            (valueSubscription?: number) => {
-                this.timeLeft = valueSubscription ?? 0;
-                if (valueSubscription === 0) {
-                    removeSubscriptionTimer();
-                }
-            }
-        );
-        const removeSubscription = subscribeStore(
-            "timerState",
-            (valueSubscription?: TimerState) => {
-                if (valueSubscription === TimerState.Stop) {
-                    this.state = States.Attacking;
-                    this.drawText(
-                        "Elige la casilla del rival que vas a atacar",
-                        this.half_width,
-                        this.half_height,
-                        1000
-                    );
-                    removeSubscription();
-                }
-            }
-        );
-        this.checkPlayerOneKeys();
-    }
-
-    attacking(){
+    playerTurn(){
+        console.log("Defendiendo");
         this.state = States.Selecting;
         const player_time = 5000;
             //calculateLogarithmTime(this.rounds_played + 1, TIME_BATLLE_SHIP_PLAYER) 
@@ -326,8 +303,8 @@ export class BattleShip extends Scene {
                 }
             }
         );
-        this.listenPlayers();
     }
+
 
     countPositions(positions : boolean[]) : number{
         let count: number = 0;
@@ -398,20 +375,36 @@ export class BattleShip extends Scene {
 
 
     checkOption(value: Positions, isPlayerOne: boolean) {
-        if(this.state == States.Defending){
-            if(isPlayerOne && this.player_one_positions[value]){
-                this.player_one_defend = value;
+        if(isPlayerOne){
+            if(this.player_one_defend == Positions.NONE){
+                if(this.player_one_positions[value]){
+                    this.player_one_defend = value;
+                    console.log("1 thinking");
+                    this.player_one!.anims.play("think", false);
+                }
             }
-            else if(!isPlayerOne && this.player_two_positions[value]){
-                this.player_two_defend = value;
+            else{
+                if(this.player_two_positions[value]){
+                    this.player_one_attack = value;
+                    console.log("1 siting");
+                    this.player_one!.anims.play("sit", false);
+                }
             }
         }
-        else if(this.state == States.Attacking){
-            if(isPlayerOne && this.player_two_positions[value]){
-                this.player_one_attack = value;
+        else{
+            if(this.player_two_defend == Positions.NONE){
+                if(this.player_two_positions[value]){
+                    this.player_two_defend = value;
+                    console.log("2 thinking");
+                    this.player_two!.anims.play("think", false);
+                }
             }
-            else if(!isPlayerOne && this.player_one_positions[value]){
-                this.player_two_attack = value;
+            else{
+                if(this.player_one_positions[value]){
+                    this.player_two_attack = value;
+                    console.log("2 siting");
+                    this.player_two!.anims.play("sit", false);
+                }
             }
         }
         
@@ -439,6 +432,7 @@ export class BattleShip extends Scene {
                 this.player_one!.y - 100,
                 TIME_TEXT_PLAYER
             );*/
+            console.log("Tecla arriba apretada");
             this.checkOption(Positions.UP, true);
         } else if (
             this.input.keyboard!.checkDown(
@@ -641,7 +635,8 @@ export class BattleShip extends Scene {
     drawText(text: string, x: number, y: number, time: number) {
         const text_object = this.add.text(x, y, text, {
             fontSize: "40px",
-            color: "#000000",
+            color: "#D4B20B",
+            fontFamily: "Ryo",
         });
         text_object.setOrigin(0.5);
         this.time.delayedCall(time, () => {
@@ -652,7 +647,8 @@ export class BattleShip extends Scene {
     drawPermanentText(text: string, x: number, y: number) {
         const text_object = this.add.text(x, y, text, {
             fontSize: "40px",
-            color: "#000000",
+            color: "#D4B20B",
+            fontFamily: "Ryo",
         });
         text_object.setOrigin(0.5);
     }
@@ -660,7 +656,8 @@ export class BattleShip extends Scene {
     drawValue(value: Positions, x: number, y: number, time: number) {
         const text = this.add.text(x, y, ""+value, {
             fontSize: "40px",
-            color: "#000000",
+            color: "#D4B20B",
+            fontFamily: "Ryo",
         });
         text.setOrigin(0.5);
 

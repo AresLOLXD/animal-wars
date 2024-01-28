@@ -1,4 +1,5 @@
 import PrimaryButton from "@gui/PrimaryButton/index";
+import Capibara from "@assets/Pose capibara/capibara pose 4.5.png";
 import { Link } from "react-router-dom";
 
 export default function () {
@@ -35,10 +36,10 @@ export default function () {
                         width="691.826"
                         height="106.523"
                         filterUnits="userSpaceOnUse"
-                        color-interpolation-filters="sRGB"
+                        colorInterpolationFilters="sRGB"
                     >
                         <feFlood
-                            flood-opacity="0"
+                            floodOpacity="0"
                             result="BackgroundImageFix"
                         />
                         <feColorMatrix
@@ -80,7 +81,27 @@ export default function () {
                 <Link to="modal/SimonDice" style={{ textDecoration: "none" }}>
                     <PrimaryButton>Jugar (2P)</PrimaryButton>
                 </Link>
-                <PrimaryButton>Creditos</PrimaryButton>
+                <Link to="#" style={{textDecoration:"none"}} 
+                onClick={() => {
+                    let creditos = document.getElementById("root")!;
+                    console.log("MainContainer:", creditos);
+                    creditos.innerHTML +=  `<div style="margin:17px 10px;padding:5px; width:230px; display:flex;flex-direction:column;background: linear-gradient(180deg, rgba(36,0,0,1) 0%, rgba(121,9,32,1) 35%, rgba(196,196,196,1) 100%);">
+                        <h3 style="color:#D4B20B;text-align:center;">Integrantes</h3>
+                        <ul style="color:#D4B20B;">
+                            <li>Gasca Ruíz Fernando</li>
+                            <li>González Ramírez Gabriel</li>
+                            <li>González Resendiz Denisse</li>
+                            <li>Juárez Martínes Ares Ulises</li>
+                            <li>Romero Lucero Alan</li>
+                            <li>Sánchez Cabrera Uriel Jeddan</li>
+                            <li>Sánchez Raygoza Roberto Daniel</li>
+                        </ul>
+                        <img src="${Capibara}" 
+                        style="transform:scaleX(-1); width=250px;"/>
+                    </div>`;
+                }}>
+                    <PrimaryButton>Creditos</PrimaryButton>
+                </Link>
             </div>
         </div>
     );

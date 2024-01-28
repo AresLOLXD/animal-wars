@@ -23,6 +23,7 @@ const defaultStore = {
     test: "Test",
 
     // Valores del juego
+    fondoActual:"fondo",
     escenaActual: "SimonSays",
 
     // Valores del minijuego

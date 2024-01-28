@@ -59,5 +59,27 @@ export class Player extends GameObjects.Sprite {
             frameRate: 10,
             repeat: 0,
         });
+        this.anims.create({
+            key: "think",
+            frames: [
+                {
+                    key: texture,
+                    frame: 3,
+                }
+            ],
+            frameRate: 10,
+            repeat: 0
+        });
+        this.anims.create({
+            key: "sit",
+            frames: [
+                {
+                    key: texture,
+                    frame: 2,
+                }
+            ],
+            frameRate: 10,
+            repeat: 0
+        });
     }
 }

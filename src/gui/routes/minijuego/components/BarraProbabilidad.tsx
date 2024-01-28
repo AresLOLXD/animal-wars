@@ -51,6 +51,8 @@ export default function ({
 
     useEffect(() => {
         if (state === BarState.Active) {
+            console.log(state, "Inicia la barra");
+
             controls.start({
                 x: reverse ? -barWidth : barWidth,
                 transition: {

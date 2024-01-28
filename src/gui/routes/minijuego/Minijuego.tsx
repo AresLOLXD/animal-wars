@@ -31,14 +31,14 @@ function BarraP1() {
                     const primerAcierto = positionAcierto + primerFallo;
                     const segundoFallo = positionFallo + primerAcierto;
 
-                    console.log(
-                        "RESULTADO",
-                        latest,
-                        primerCritico,
-                        primerFallo,
-                        primerAcierto,
-                        segundoFallo
-                    );
+                    // console.log(
+                    //     "RESULTADO",
+                    //     latest,
+                    //     primerCritico,
+                    //     primerFallo,
+                    //     primerAcierto,
+                    //     segundoFallo
+                    // );
 
                     if (latest <= primerCritico) {
                         resultado = BarResult.Critico;
@@ -87,14 +87,14 @@ function BarraP2() {
                     const primerAcierto = positionAcierto + primerFallo;
                     const segundoFallo = positionFallo + primerAcierto;
 
-                    console.log(
-                        "RESULTADO",
-                        latest,
-                        primerCritico,
-                        primerFallo,
-                        primerAcierto,
-                        segundoFallo
-                    );
+                    // console.log(
+                    //     "RESULTADO",
+                    //     latest,
+                    //     primerCritico,
+                    //     primerFallo,
+                    //     primerAcierto,
+                    //     segundoFallo
+                    // );
 
                     if (latest >= primerCritico) {
                         resultado = BarResult.Critico;

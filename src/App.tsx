@@ -42,7 +42,7 @@ const router = createHashRouter([
 
 function App() {
     return (
-        <div
+        <div id="mainContainer"
             style={{
                 position: "absolute",
                 width: "100vw",
@@ -54,10 +54,9 @@ function App() {
                 padding: "1rem",
                 justifyContent: "center",
                 alignItems: "center",
-                // backgroundColor: "white",
             }}
         >
-            <div id="phaser-background"
+            <div
                 style={{
                     width: gameConfig.width,
                     height: gameConfig.height,

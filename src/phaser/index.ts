@@ -11,9 +11,9 @@ const config: Types.Core.GameConfig = {
         BootLoader,
         //TODO: Quitar el simon dice y poner el menu principal
         MainMenu,
-        SimonSays,
         SPS,
-        BattleShip
+        BattleShip,
+        SimonSays,
     ],
     parent: "phaser-content",
     physics: {

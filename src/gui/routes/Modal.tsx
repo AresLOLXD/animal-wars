@@ -54,6 +54,44 @@ const Controles = {
             choose: "any",
         },
     },
+    SPS: {
+        navegar: "/minijuego",
+        escenaPhaser: "SPS",
+        titulo: "piedra papel o tijeras",
+        J1: {
+            izquierda: "key-a",
+            derecha: "key-d",
+            abajo: "undefined",
+            arriba: "undefined",
+            choose: "key-w",
+        },
+        J2: {
+            izquierda: "key-left",
+            derecha: "key-right",
+            abajo: "undefined",
+            arriba: "undefined",
+            choose: "key-up",
+        },
+    },
+    BattleShip: {
+        navegar: "/minijuego",
+        escenaPhaser: "BattleShip",
+        titulo: "batalla",
+        J1: {
+            izquierda: "key-a",
+            derecha: "key-d",
+            abajo: "undefined",
+            arriba: "undefined",
+            choose: "key-w",
+        },
+        J2: {
+            izquierda: "key-left",
+            derecha: "key-right",
+            abajo: "undefined",
+            arriba: "undefined",
+            choose: "key-up",
+        },
+    },
 };
 
 const IconosControles = {

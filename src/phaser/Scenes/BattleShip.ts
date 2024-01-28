@@ -70,6 +70,10 @@ export class BattleShip extends Scene {
     rounds_played_text: Phaser.GameObjects.Text | null = null;
 
     timeLeft: number = 0;
+
+    times_player_one: number = 0;
+    times_player_two: number = 0;
+
     points_player_one_text: Phaser.GameObjects.Text | null = null;
     points_player_two_text: Phaser.GameObjects.Text | null = null;
 
@@ -257,8 +261,8 @@ export class BattleShip extends Scene {
 
     defending(){
         this.state = States.Selecting;
-        const player_time =
-            calculateLogarithmTime(this.rounds_played + 1, TIME_BATLLE_SHIP_PLAYER) 
+        const player_time = 5000;
+            //calculateLogarithmTime(this.rounds_played + 1, TIME_BATLLE_SHIP_PLAYER) 
         console.log("Player Time: ", player_time);
         setStore("timerTiempoMaximo", player_time);
         setStore("timerState", TimerState.Start);
@@ -291,8 +295,8 @@ export class BattleShip extends Scene {
 
     attacking(){
         this.state = States.Selecting;
-        const player_time =
-            calculateLogarithmTime(this.rounds_played + 1, TIME_BATLLE_SHIP_PLAYER) 
+        const player_time = 5000;
+            //calculateLogarithmTime(this.rounds_played + 1, TIME_BATLLE_SHIP_PLAYER) 
         console.log("Player Time: ", player_time);
         setStore("timerTiempoMaximo", player_time);
         setStore("timerState", TimerState.Start);

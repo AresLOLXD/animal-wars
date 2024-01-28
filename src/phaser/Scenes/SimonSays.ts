@@ -35,7 +35,7 @@ enum States {
     AnimatingAttackP1,
     AnimatingAttackP2,
     Animating,
-    CheckEnd,
+    CheckingEnd,
     GameOver,
 }
 
@@ -289,8 +289,9 @@ export class SimonSays extends Scene {
             case States.AnimatingAttackP2:
                 this.animateAttackP2();
                 break;
-            case States.CheckEnd:
-                this.checkA
+            case States.CheckingEnd:
+                this.checkingEnd();
+                break;
         }
     }
     listeningSecondCriticalTurn() {
@@ -1045,25 +1046,61 @@ export class SimonSays extends Scene {
         if (this.player_one_result_bar === BarResult.Acierto) {
             //TODO:Agregar animacion de quitar ropa
             this.removeOneGarmentPlayerTwo();
+            if(this.start_player_one){
+                this.animarPayBomba(States.AnimatingAttackP2, true);
+            }
+            else{
+                this.animarPayBomba(States.CheckingEnd, true);
+            }
         } else if (this.player_one_result_bar === BarResult.Critico) {
             //TODO:Agregar animacion de quitar ropa a uno mismo P1
             this.removeOneGarmentPlayerOne();
+            if(this.start_player_one){
+                this.animarPayNuclear(States.AnimatingAttackP2, true);
+            }
+            else{
+                this.animarPayNuclear(States.CheckingEnd, true);
+            }
         }
         else{
-            this.animarPayFake();
+            if(this.start_player_one){
+                this.animarPayFake(States.AnimatingAttackP2);
+            }
+            else{
+                this.animarPayFake(States.CheckingEnd);
+            }
         }
     }
 
     animateAttackP2(){
+        this.state = States.Animating;
         if (this.player_two_result_bar === BarResult.Acierto) {
             //TODO:Agregar animacion de quitar ropa
             this.removeOneGarmentPlayerOne();
+            if(this.start_player_one){
+                this.animarPayBomba(States.CheckingEnd, false);
+            }
+            else{
+                this.animarPayBomba(States.AnimatingAttackP1, false);
+            }
         } else if (this.player_two_result_bar === BarResult.Critico) {
             //TODO:Agregar animacion de quitar ropa a uno mismo P2
             this.removeOneGarmentPlayerTwo();
+            if(this.start_player_one){
+                this.animarPayNuclear(States.CheckingEnd, false);
+            }
+            else{
+                this.animarPayNuclear(States.AnimatingAttackP1, false);
+            }
         }
         else{
-            this.animarPayFake();
+            if(this.start_player_one){
+                this.animarPayFake(States.CheckingEnd);
+            }
+            else{
+                this.animarPayFake(States.AnimatingAttackP1);
+            }
+            
         }
     }
 
@@ -1077,20 +1114,91 @@ export class SimonSays extends Scene {
     }
 
     animarPayFake(state : States){
-        let payFake1 = new Pay(this, 100, this.half_height+40, "pay_fake");
+        let payFake1 = new Pay(this, 100, this.half_height+40, "pays");
         payFake1.setScale(SCALE_FACTOR * 1);
 
-        let payFake2 = new Pay(this, this.width-100, this.half_height+40, "pay_fake");
+        let payFake2 = new Pay(this, this.width-100, this.half_height+40, "pays");
         payFake2.setScale(SCALE_FACTOR * 1);
 
-        payFake1.anims.play("idle_pay_fake", false)
+        payFake1.anims.play("pay_fake", false)
 
-        payFake2.anims.play("idle_pay_fake", false).on(
+        payFake2.anims.play("pay_fake", false).on(
             Animations.Events.ANIMATION_COMPLETE,
             () => {
+                console.log("Finalizo la animacion");
                 payFake1.destroy();
                 payFake2.destroy();
                 this.state = state;
+            }
+        );
+    }
+
+    animarPayNuclear(state : States, isPlayerOne: boolean){
+        let payFake;
+        let payNuc;
+        if(isPlayerOne){
+            payNuc = new Pay(this, 100, this.half_height+40, "pays");   
+            payFake = new Pay(this, this.width-100, this.half_height+40, "pays");
+        }
+        else{
+            payFake = new Pay(this, 100, this.half_height+40, "pays");   
+            payNuc = new Pay(this, this.width-100, this.half_height+40, "pays");
+        }
+
+
+
+        payNuc.anims.play("pay_nuc", false).on(
+            Animations.Events.ANIMATION_COMPLETE,
+            () => {
+                console.log("Finalizo la animacion de bomba");
+                payNuc.destroy();
+                this.checkGameOver();
+                if(this.state != States.GameOver){
+                    this.state = state;
+                }
+            }
+        );
+
+        payFake.anims.play("pay_fake", false).on(
+            Animations.Events.ANIMATION_COMPLETE,
+            () => {
+                console.log("Finalizo la animacion");
+                payFake.destroy();
+            }
+        );
+    }
+
+    animarPayBomba(state : States, isPlayerOne: boolean){
+        let payFake;
+        let payBomba;
+        if(isPlayerOne){
+            payFake = new Pay(this, 100, this.half_height+40, "pays");   
+            payBomba = new Pay(this, this.width-100, this.half_height+40, "pays");
+        }
+        else{
+            payBomba = new Pay(this, 100, this.half_height+40, "pays");   
+            payFake = new Pay(this, this.width-100, this.half_height+40, "pays");
+        }
+
+
+
+        payBomba.anims.play("pay_exp", false).on(
+            Animations.Events.ANIMATION_COMPLETE,
+            () => {
+                console.log("Finalizo la animacion de bomba");
+                payBomba.destroy();
+                this.checkGameOver();
+                if(this.state != States.GameOver){
+                    this.state = state;
+                }
+            }
+        );
+
+        payFake.anims.play("pay_fake", false).on(
+            Animations.Events.ANIMATION_COMPLETE,
+            () => {
+                console.log("Finalizo la animacion");
+                payFake.destroy();
             }
         );
     }

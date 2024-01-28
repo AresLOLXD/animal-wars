@@ -54,9 +54,9 @@ export class BootLoader extends Scene {
             frameHeight: 600,
         });
 
-        this.load.spritesheet("pay_fake", "Pay/payfalso.png",{
-            frameWidth: 400,
-            frameHeight: 400
+        this.load.spritesheet("pays", "SpriteSheet/Pays_SS.png",{
+            frameWidth: 300,
+            frameHeight: 300
         });
 
         this.load.audio("animal_up", "Audios/Animal_Arr.mp3");

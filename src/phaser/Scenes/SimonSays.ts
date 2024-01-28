@@ -5,10 +5,11 @@ import {
     TIME_SIMON_SAYS,
     TIME_SIMON_SAYS_PLAYER,
     TIME_TEXT_PLAYER,
+    TURNS_TO_CRITIC,
     calculateDimensions,
     calculateLogarithmTime,
 } from "@phaser/Util";
-import { TimerState } from "@store/defaultStore";
+import { BarResult, BarState, TimerState } from "@store/defaultStore";
 import { getStore, setStore, subscribeStore } from "@store/index";
 import { Input, Math as MathP, Scene, Animations } from "phaser";
 
@@ -28,6 +29,9 @@ enum States {
     EvaluateTurn,
     PostEvaluateTurn,
     CriticalTurn,
+    ListeningFirstCriticalTurn,
+    ListeningSecondCriticalTurn,
+    EvaluateCriticalTurn,
     GameOver,
 }
 
@@ -77,14 +81,22 @@ export class SimonSays extends Scene {
     clothes_player_one: Clothes[] = [];
     clothes_player_two: Clothes[] = [];
 
+    player_one_barUsed: boolean = false;
+    player_two_barUsed: boolean = false;
+
+    total_time_player_one: number = 0;
+    total_time_player_two: number = 0;
+    start_player_one: boolean = false;
+
+    player_one_result_bar: BarResult = BarResult.Fallo;
+    player_two_result_bar: BarResult = BarResult.Fallo;
+
     constructor() {
         super({
             key: "SimonSays",
         });
     }
     preload() {
-        console.log("Preload SimonDice");
-
         [this.half_width, this.half_height, this.width, this.height] =
             calculateDimensions(this);
 
@@ -208,7 +220,6 @@ export class SimonSays extends Scene {
     }
 
     create() {
-        console.log("Create SimonDice");
         this.add.existing(this.player_one!);
         this.add.existing(this.player_two!);
         this.time.delayedCall(1000, () => {
@@ -231,24 +242,182 @@ export class SimonSays extends Scene {
         this.redrawTextPoints();
         switch (this.state) {
             case States.SimonTurn:
+                console.log("Turno de simon");
                 this.simonTurn();
                 break;
             case States.PlayersTurn:
+                console.log("Turno de los jugadores");
                 this.playerTurn();
-
                 break;
             case States.ListeningPlayer:
+                console.log("Escuchando a los jugadores");
                 this.listenPlayers();
                 break;
             case States.EvaluateTurn:
+                console.log("Evaluando turno");
                 this.evaluateTurn();
                 break;
             case States.CriticalTurn:
+                console.log("Turno critico");
                 this.criticalTurn();
                 break;
+            case States.ListeningFirstCriticalTurn:
+                console.log("Escuchando primer turno critico");
+                this.listeningFirstCriticalTurn();
+                break;
+            case States.ListeningSecondCriticalTurn:
+                console.log("Escuchando segundo turno critico");
+                this.listeningSecondCriticalTurn();
+                break;
             case States.GameOver:
+                console.log("Game Over");
                 this.gameOver();
                 break;
+            case States.EvaluateCriticalTurn:
+                console.log("Evaluando turno critico");
+                this.evaluateCriticalTurn();
+                break;
+        }
+    }
+    listeningSecondCriticalTurn() {
+        if (!this.start_player_one) {
+            this.checkAnyKeyPressedPlayerOne();
+        } else {
+            this.checkAnyKeyPressedPlayerTwo();
+        }
+    }
+    checkGameOver() {
+        if (this.state !== States.GameOver) {
+            if (this.clothes_player_one.length === 0) {
+                this.state = States.GameOver;
+                this.drawPermanentText(
+                    `Gano el jugador ${getStore<string>("p2Name")}`,
+                    this.half_width,
+                    this.half_height
+                );
+            } else if (this.clothes_player_two.length === 0) {
+                this.state = States.GameOver;
+                this.drawPermanentText(
+                    `Gano el jugador ${getStore<string>("p1Name")}`,
+                    this.half_width,
+                    this.half_height
+                );
+            }
+        }
+    }
+    listeningFirstCriticalTurn() {
+        if (this.start_player_one) {
+            if (this.checkAnyKeyPressedPlayerOne()) {
+                this.checkGameOver();
+                if (this.state === States.GameOver) {
+                    return;
+                }
+                this.state = States.ListeningSecondCriticalTurn;
+                this.drawText(
+                    `Presiona cualquier tecla para detener la barra ${getStore<string>(
+                        "p2Name"
+                    )}`,
+                    this.half_width,
+                    this.half_height,
+                    1000
+                );
+                setStore("timerTiempoMaximo", 5000);
+                setStore("timerState", TimerState.Start);
+                setStore("p2BarState", BarState.Active);
+                const removeSubscriptionTimer = subscribeStore(
+                    "timerValue",
+                    (valueSubscription?: number) => {
+                        if (valueSubscription === 0) {
+                            if (!this.player_two_barUsed) {
+                                setStore("p2BarState", BarState.Stop);
+                                this.player_two_barUsed = true;
+                            }
+                            this.checkP2BarResult(
+                                getStore<BarResult>("p2BarResult")
+                            );
+                            removeSubscriptionTimer();
+                        }
+                    }
+                );
+            }
+        } else {
+            if (this.checkAnyKeyPressedPlayerTwo()) {
+                this.checkGameOver();
+                if (this.state === States.GameOver) {
+                    return;
+                }
+                this.state = States.ListeningSecondCriticalTurn;
+
+                this.drawText(
+                    `Presiona cualquier tecla para detener la barra ${getStore<string>(
+                        "p1Name"
+                    )}`,
+                    this.half_width,
+                    this.half_height,
+                    1000
+                );
+                setStore("timerTiempoMaximo", 5000);
+                setStore("timerState", TimerState.Start);
+                setStore("p1BarState", BarState.Active);
+                const removeSubscriptionTimer = subscribeStore(
+                    "timerValue",
+                    (valueSubscription?: number) => {
+                        this.timeLeft = valueSubscription ?? 0;
+                        if (valueSubscription === 0) {
+                            if (!this.player_one_barUsed) {
+                                setStore("p1BarState", BarState.Stop);
+                                this.player_one_barUsed = true;
+                            }
+                            this.checkP1BarResult(
+                                getStore<BarResult>("p1BarResult")
+                            );
+                            removeSubscriptionTimer();
+                        }
+                    }
+                );
+            }
+        }
+    }
+
+    evaluateCriticalTurn() {
+        if (this.start_player_one) {
+            this.evaluateBarResultPlayerOne();
+            this.checkGameOver();
+            if (this.state === States.GameOver) {
+                return;
+            }
+            this.evaluateBarResultPlayerTwo();
+        } else {
+            this.evaluateBarResultPlayerTwo();
+            this.checkGameOver();
+            if (this.state === States.GameOver) {
+                return;
+            }
+            this.evaluateBarResultPlayerOne();
+        }
+        this.state = States.SimonTurn;
+        this.total_time_player_one = 0;
+        this.total_time_player_two = 0;
+        this.player_one_barUsed = false;
+        this.player_two_barUsed = false;
+        this.checkGameOver();
+    }
+    evaluateBarResultPlayerOne() {
+        if (this.player_one_result_bar === BarResult.Acierto) {
+            //TODO:Agregar animacion de quitar ropa
+            this.removeOneGarmentPlayerTwo();
+        } else if (this.player_one_result_bar === BarResult.Critico) {
+            //TODO:Agregar animacion de quitar ropa a uno mismo P1
+            this.removeOneGarmentPlayerTwo();
+        }
+    }
+    evaluateBarResultPlayerTwo() {
+        if (this.player_two_result_bar === BarResult.Acierto) {
+            //TODO:Agregar animacion de quitar ropa
+            this.removeOneGarmentPlayerOne();
+        } else if (this.player_two_result_bar === BarResult.Critico) {
+            //TODO:Agregar animacion de quitar ropa a uno mismo P2
+            this.removeOneGarmentPlayerOne();
         }
     }
     playerTurn() {
@@ -261,7 +430,6 @@ export class SimonSays extends Scene {
         const player_time =
             calculateLogarithmTime(this.rounds_played, TIME_SIMON_SAYS_PLAYER) *
             this.simonSaysValues.length;
-        console.log("Player Time: ", player_time);
         setStore("timerTiempoMaximo", player_time);
         setStore("timerState", TimerState.Start);
         const removeSubscriptionTimer = subscribeStore(
@@ -358,8 +526,9 @@ export class SimonSays extends Scene {
             setStore("p2Score", this.score_player_two);
 
             this.time.delayedCall(1000, () => {
-                if (this.rounds_played % 9 === 0) {
+                if (this.rounds_played % TURNS_TO_CRITIC === 0) {
                     this.state = States.CriticalTurn;
+                    this.prepareCriticalTurn();
                 } else {
                     this.state = States.SimonTurn;
                 }
@@ -400,14 +569,12 @@ export class SimonSays extends Scene {
             case ValueSimon.RIGHT:
                 this.sound.play("animal_right");
                 if (!this.simon!.flipX) {
-                    console.log("Flip");
                     this.simon!.setFlipX(true);
                 }
                 this.simon!.anims.play("left", false).on(
                     Animations.Events.ANIMATION_COMPLETE,
                     () => {
                         if (this.simon!.flipX) {
-                            console.log("Reflip");
                             this.simon!.setFlipX(false);
                         }
                         this.simon!.anims.play("idle", true);
@@ -436,9 +603,6 @@ export class SimonSays extends Scene {
         const total_time =
             simon_time * this.simonSaysValues.length +
             500 * this.simonSaysValues.length;
-        console.log("Simon Time: ", simon_time);
-        console.log("Simon Says: ", this.simonSaysValues);
-        console.log("Total Time: ", total_time);
         this.state = States.SayingTurn;
         for (let i = 0; i < this.simonSaysValues.length; i++) {
             const letter = this.simonSaysValues[i];
@@ -461,8 +625,6 @@ export class SimonSays extends Scene {
     }
 
     compareAnswers(values: ValueSimon[], final: boolean = false): boolean {
-        console.log("Simon Says: ", this.simonSaysValues);
-        console.log("Player Says: ", values);
         if (values.length !== this.simonSaysValues.length && final) {
             return false;
         }
@@ -494,10 +656,12 @@ export class SimonSays extends Scene {
         if (this.player_one_values.length === this.simonSaysValues.length) {
             this.listen_player_one_keys = false;
             this.times_player_one += this.timeLeft;
+            this.total_time_player_one += this.timeLeft;
         }
         if (this.player_two_values.length === this.simonSaysValues.length) {
             this.listen_player_two_keys = false;
             this.times_player_two += this.timeLeft;
+            this.total_time_player_two += this.timeLeft;
         }
     }
 
@@ -553,14 +717,12 @@ export class SimonSays extends Scene {
             )
         ) {
             if (this.player_one!.flipX) {
-                console.log("Flip");
                 this.player_one!.setFlipX(false);
             }
             this.player_one!.anims.play("left", false).on(
                 Animations.Events.ANIMATION_COMPLETE,
                 () => {
                     if (!this.player_one!.flipX) {
-                        console.log("Reflip");
                         this.player_one!.setFlipX(true);
                     }
                     this.player_one!.anims.play("idle", true);
@@ -592,6 +754,14 @@ export class SimonSays extends Scene {
                 TIME_TEXT_PLAYER
             );
             this.getAnswer(ValueSimon.RIGHT, true);
+        }
+    }
+
+    prepareCriticalTurn() {
+        if (this.total_time_player_one > this.total_time_player_two) {
+            this.start_player_one = true;
+        } else {
+            this.start_player_one = false;
         }
     }
 
@@ -669,7 +839,6 @@ export class SimonSays extends Scene {
             )
         ) {
             if (!this.player_two!.flipX) {
-                console.log("Flip");
                 this.player_two!.setFlipX(true);
                 this.clothes_player_two.forEach((clothes) => {
                     clothes.setFlipXAll(true);
@@ -682,7 +851,6 @@ export class SimonSays extends Scene {
                 Animations.Events.ANIMATION_COMPLETE,
                 () => {
                     if (this.player_two!.flipX) {
-                        console.log("Reflip");
                         this.player_two!.setFlipX(false);
                         this.clothes_player_two.forEach((clothes) => {
                             clothes.setFlipXAll(false);
@@ -709,17 +877,145 @@ export class SimonSays extends Scene {
             this.checkPlayerTwoKeys();
         }
     }
-    criticalTurn() {
-        this.clothes_player_one.forEach((clothes) => {
-            clothes.removeAllGarments();
-        });
-        this.clothes_player_two.forEach((clothes) => {
-            clothes.removeAllGarments();
-        });
-        this.clothes_player_one.shift();
-        this.clothes_player_two.shift();
+
+    removeOneGarmentPlayerOne() {
+        if (this.clothes_player_one.length > 0) {
+            const clothes = this.clothes_player_one.pop();
+            clothes!.removeAllGarments();
+        }
     }
-    gameOver() {}
+
+    removeOneGarmentPlayerTwo() {
+        if (this.clothes_player_two.length > 0) {
+            const clothes = this.clothes_player_two.pop();
+            clothes!.removeAllGarments();
+        }
+    }
+
+    checkToEvaluateCriticalTurn() {
+        if (this.player_one_barUsed && this.player_two_barUsed) {
+            this.state = States.EvaluateCriticalTurn;
+        }
+    }
+
+    checkP1BarResult(result: BarResult) {
+        this.player_one_result_bar = result;
+        console.log("Result P1:", result);
+        this.checkToEvaluateCriticalTurn();
+    }
+
+    checkP2BarResult(result: BarResult) {
+        console.log("Result P2:", result);
+        this.player_two_result_bar = result;
+        this.checkToEvaluateCriticalTurn();
+    }
+
+    criticalTurn() {
+        this.state = States.ListeningFirstCriticalTurn;
+        this.player_one_barUsed = false;
+        this.player_two_barUsed = false;
+        if (this.start_player_one) {
+            console.log("Inicia el p1");
+            this.drawText(
+                `Presiona cualquier tecla para detener la barra ${getStore<string>(
+                    "p1Name"
+                )}`,
+                this.half_width,
+                this.half_height,
+                1000
+            );
+            setStore("timerTiempoMaximo", 5000);
+            setStore("timerState", TimerState.Start);
+            setStore("p1BarState", BarState.Active);
+            const removeSubscriptionTimer = subscribeStore(
+                "timerValue",
+                (valueSubscription?: number) => {
+                    this.timeLeft = valueSubscription ?? 0;
+                    if (valueSubscription === 0) {
+                        if (!this.player_one_barUsed) {
+                            setStore("p1BarState", BarState.Stop);
+                            this.player_one_barUsed = true;
+                        }
+                        this.checkP1BarResult(
+                            getStore<BarResult>("p1BarResult")
+                        );
+                        removeSubscriptionTimer();
+                    }
+                }
+            );
+            const removeSubscriptionBar = subscribeStore(
+                "p1BarState",
+                (valueSubscription?: BarState) => {
+                    if (valueSubscription === BarState.Stop) {
+                        this.checkP1BarResult(this.player_one_result_bar);
+                        removeSubscriptionBar();
+                    }
+                }
+            );
+        } else {
+            console.log("Inicia el p2");
+            this.drawText(
+                `Presiona cualquier tecla para detener la barra ${getStore<string>(
+                    "p2Name"
+                )}`,
+                this.half_width,
+                this.half_height,
+                1000
+            );
+            setStore("timerTiempoMaximo", 5000);
+            setStore("timerState", TimerState.Start);
+            setStore("p2BarState", BarState.Active);
+            const removeSubscriptionTimer = subscribeStore(
+                "timerValue",
+                (valueSubscription?: number) => {
+                    this.timeLeft = valueSubscription ?? 0;
+                    if (valueSubscription === 0) {
+                        if (!this.player_two_barUsed) {
+                            setStore("p2BarState", BarState.Stop);
+                            this.player_two_barUsed = true;
+                        }
+                        this.checkP2BarResult(
+                            getStore<BarResult>("p2BarResult")
+                        );
+                        removeSubscriptionTimer();
+                    }
+                }
+            );
+        }
+    }
+    checkAnyKeyPressedPlayerOne() {
+        if (
+            (this.keys_player_one!.up.isDown ||
+                this.keys_player_one!.down.isDown ||
+                this.keys_player_one!.left.isDown ||
+                this.keys_player_one!.right.isDown) &&
+            !this.player_one_barUsed
+        ) {
+            console.log("Lo detuvo el p1");
+            setStore("p1BarState", BarState.Stop);
+            this.player_one_barUsed = true;
+            return true;
+        }
+        return false;
+    }
+    checkAnyKeyPressedPlayerTwo() {
+        if (
+            (this.keys_player_two!.up.isDown ||
+                this.keys_player_two!.down.isDown ||
+                this.keys_player_two!.left.isDown ||
+                this.keys_player_two!.right.isDown) &&
+            !this.player_two_barUsed
+        ) {
+            console.log("Lo detuvo el p2");
+            setStore("p2BarState", BarState.Stop);
+            this.player_two_barUsed = true;
+            return true;
+        }
+        return false;
+    }
+    gameOver() {
+        //TODO:Agregar animacion de game over
+    }
 
     getRandomValue(): ValueSimon {
         const values_array = Object.values(ValueSimon);

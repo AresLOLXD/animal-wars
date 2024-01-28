@@ -67,6 +67,8 @@ const Column = styled(motion.div)`
 export default function () {
     const { minijuego } = useParams();
 
+    const controles = Controles[minijuego as keyof typeof Controles];
+
     const modalPrincipal: Variants = {
         normal: {
             background: "rgba(28,26,27,0.8)",

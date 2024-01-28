@@ -9,9 +9,9 @@ import { getStore, setStore, subscribeStore } from "@store/index";
 import { Scene, Input, Animations } from "phaser";
 
 enum ValueSPS {
-    PIEDRA = "Arriba",
-    PAPEL = "Abajo",
-    TIJERA = "Izquierda"
+    PIEDRA = "Piedra",
+    PAPEL = "Papel",
+    TIJERA = "Tijera"
 }
 
 enum States {
@@ -58,6 +58,9 @@ export class SPS extends Scene {
 
     clothes_player_one: Clothes[] = [];
     clothes_player_two: Clothes[] = [];
+
+    score_player_one: number = 0;
+    score_player_two: number = 0;
 
     state: States = States.Beginning;
 
@@ -149,24 +152,27 @@ export class SPS extends Scene {
     }
 
     update() {
-        console.log("update SPS "+this.state);
+        // console.log("update SPS "+this.state);
         switch (this.state) {
             case States.PlayersElection:
-                console.log("PlayersElection");
+                // console.log("PlayersElection");
                 this.playersElection();
                 break;
             case States.ListeningPlayer:
                 this.listenPlayers();
-                console.log("ListeningPlayer");
+                // console.log("ListeningPlayer");
                 break;
             case States.EvaluateTurn:
-                console.log("EvaluateTurn");
+                this.evaluateResult();
+                // console.log("EvaluateTurn");
                 break;
             case States.PostEvaluateTurn:
+                this.postEvaluate();
                 console.log("PostEvaluateTurn");
                 break;
             case States.CriticalTurn:
                 console.log("CriticalTurn");
+                this.criticalTurn();
                 break;
             case States.GameOver:
                 console.log("GameOver");
@@ -184,11 +190,13 @@ export class SPS extends Scene {
     getAnswer(value: ValueSPS, isPlayerOne: boolean) {
         if ( isPlayerOne && this.player_one_values == null ) {
             this.player_one_values = value;
+            console.log("Valor jugador 1 "+this.player_one_values);
             this.listen_player_one_keys = false;
             //this.listen_player_one_keys = this.compareAnswers(this.player_one_values);
             //return this.listen_player_one_keys;
         } else if ( !isPlayerOne && this.player_two_values == null ) {
-            this.player_two_values == value;
+            this.player_two_values = value;
+            console.log("Valor jugador 2 "+this.player_two_values);
             this.listen_player_two_keys = false;
             //this.listen_player_two_keys = this.compareAnswers(this.player_two_values);
             //return this.listen_player_two_keys;
@@ -385,6 +393,51 @@ export class SPS extends Scene {
         if (this.listen_player_two_keys) {
             this.checkPlayerTwoKeys();
         }
+        if( !this.listen_player_one_keys && !this.listen_player_two_keys){
+            this.state = States.EvaluateTurn;
+        }
+    }
+
+    evaluateResult() {
+        if(this.player_one_values == this.player_two_values){
+
+        }
+        //Gana el jugador 1
+        if(this.player_one_values == ValueSPS.PAPEL && this.player_two_values == ValueSPS.PIEDRA){
+            this.score_player_one ++;
+        }
+        if(this.player_one_values == ValueSPS.PIEDRA && this.player_two_values == ValueSPS.TIJERA){
+            this.score_player_one ++;
+        }
+        if(this.player_one_values == ValueSPS.TIJERA && this.player_two_values == ValueSPS.PAPEL){
+            this.score_player_one ++;
+        }
+        //Gana el jugador 2
+        if(this.player_two_values == ValueSPS.PAPEL && this.player_one_values == ValueSPS.PIEDRA){
+            this.score_player_two ++;
+        }
+        if(this.player_two_values == ValueSPS.PIEDRA && this.player_one_values == ValueSPS.TIJERA){
+            this.score_player_two ++;
+        }
+        if(this.player_two_values == ValueSPS.TIJERA && this.player_one_values == ValueSPS.PAPEL){
+            this.score_player_two ++;
+        }
+        this.redrawTextPoints();
+        this.state = States.PostEvaluateTurn;
+    }
+
+    postEvaluate(){
+        if( (this.score_player_one  % 3 ==0) || (this.score_player_two % 3 == 0) ){
+            this.state = States.CriticalTurn;
+        }else {
+            this.state = States.PlayersElection;
+        }
+    }
+
+    criticalTurn(){
+        this.time.delayedCall(1000, () => {
+            this.state = States.PlayersElection;            
+        });
     }
 
     gameOver() {}
@@ -406,6 +459,15 @@ export class SPS extends Scene {
         this.time.delayedCall(time, () => {
             text_object.destroy();
         });
+    }
+
+    redrawTextPoints() {
+        this.points_player_one_text!.setText(
+            `Puntos: ${this.score_player_one}`
+        );
+        this.points_player_two_text!.setText(
+            `Puntos: ${this.score_player_two}`
+        );
     }
 
 }

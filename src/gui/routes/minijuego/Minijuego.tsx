@@ -116,14 +116,13 @@ function BarraP2() {
     );
 }
 
-export default function () {
+function Timer() {
     const { timerValue } = useGameTimer();
 
-    const p2Score = useSyncExternalStore(...syncStore<number>("p2Score"));
-    const p2BarState = useSyncExternalStore(
-        ...syncStore<BarState>("p2BarState")
-    );
+    return <>{timerValue}</>;
+}
 
+export default function () {
     return (
         <div
             style={{
@@ -135,7 +134,7 @@ export default function () {
             }}
         >
             <div>
-                {timerValue}
+                <Timer />
                 <Outlet />
             </div>
             <div

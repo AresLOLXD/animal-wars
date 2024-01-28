@@ -53,12 +53,12 @@ export default function ({
         if (state === BarState.Active) {
             console.log(state, "Inicia la barra");
 
+            x.set(0);
             controls.start({
                 x: reverse ? -barWidth : barWidth,
                 transition: {
                     duration: speed,
                     repeat: Infinity,
-                    type: "tween",
                     repeatType: "reverse",
                     repeatDelay: 0.237,
                     ease: "linear",

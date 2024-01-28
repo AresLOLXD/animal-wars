@@ -1,12 +1,15 @@
+import { BarState } from "@store/defaultStore";
 import {
+    MotionValue,
     motion,
     useAnimationControls,
     useMotionValue,
     useMotionValueEvent,
 } from "framer-motion";
-import { useEffect, useState } from "react";
+import { MutableRefObject, useEffect, useRef, useState } from "react";
 
 const defaultSpeed = 0.2;
+export const barWidth = 400;
 export enum DefaultProbs {
     Critico = 50,
     Fallo = 30,
@@ -16,26 +19,35 @@ export enum DefaultProbs {
 export default function ({
     reverse,
     score,
+    handleChange,
+    state,
 }: {
     reverse?: boolean;
     score: number;
+    state: BarState;
+    handleChange: (
+        probabilidades: MutableRefObject<number[]>,
+        controls: MotionValue<number>
+    ) => (latest: number) => void;
 }) {
-    const [barWidth, setBarWidth] = useState(400);
     const [speed, setSpeed] = useState(defaultSpeed + score * 0.015);
     const [[falloCritico, acierto], setProbabilidades] = useState([50, 20]);
+    const probabilidades = useRef([0, 0, 0]);
     const totalProbabilidades = falloCritico + DefaultProbs.Fallo + acierto;
     const porcentajeFalloCritico = falloCritico / (2 * totalProbabilidades);
     const porcentajeFallo = DefaultProbs.Fallo / (2 * totalProbabilidades);
     const porcentajeAcierto = acierto / totalProbabilidades;
 
+    probabilidades.current = [
+        porcentajeFalloCritico,
+        porcentajeFallo,
+        porcentajeAcierto,
+    ];
+
     const x = useMotionValue(0);
     const controls = useAnimationControls();
 
-    useMotionValueEvent(x, "change", (latest) => {
-        if (latest >= barWidth / 2) {
-            controls.stop();
-        }
-    });
+    useMotionValueEvent(x, "change", handleChange(probabilidades, x));
 
     useEffect(() => {
         controls.start({
@@ -49,7 +61,7 @@ export default function ({
                 ease: "linear",
             },
         });
-    }, []);
+    }, [state]);
 
     useEffect(() => {
         if (score <= 3 || score >= -3) {
@@ -77,8 +89,6 @@ export default function ({
         const newSpeed = defaultSpeed + score * 10;
         setSpeed(newSpeed <= 0 ? 0.1 : newSpeed);
     }, [score]);
-
-    console.log("BAR SPEED RENDER", defaultSpeed);
 
     return (
         <>

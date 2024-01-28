@@ -46,10 +46,22 @@ function App() {
                 display: "flex",
                 flexDirection: "column",
                 padding: "1rem",
+                justifyContent: "center",
+                alignItems: "center",
                 // backgroundColor: "white",
             }}
         >
-            <RouterProvider router={router} />
+            <div
+                style={{
+                    width: "100%",
+                    height: "100%",
+                    display: "flex",
+                    flexDirection: "column",
+                    padding: "1rem",
+                }}
+            >
+                <RouterProvider router={router} />
+            </div>
         </div>
     );
 }

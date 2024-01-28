@@ -35,7 +35,7 @@ export default function () {
                         width="691.826"
                         height="106.523"
                         filterUnits="userSpaceOnUse"
-                        color-interpolation-filters="sRGB"
+                        colorInterpolationFilters="sRGB"
                     >
                         <feFlood
                             flood-opacity="0"

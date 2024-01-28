@@ -127,7 +127,7 @@ function Timer() {
                 display: "flex",
                 justifyContent: "center",
                 flexDirection: "column",
-                alignItems: "center",
+                alignItems: "end",
             }}
         >
             <motion.div

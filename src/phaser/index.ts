@@ -1,5 +1,6 @@
 import { AUTO, Game, Types } from "phaser";
 import { BootLoader, MainMenu, SimonSays } from "./Scenes";
+export {config as gameConfig};
 
 const config: Types.Core.GameConfig = {
     type: AUTO,

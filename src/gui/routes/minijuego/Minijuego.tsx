@@ -39,6 +39,7 @@ export default function () {
             >
                 <BarraProbabilidad
                     score={p1Score}
+                    state={p1BarState}
                     handleChange={(probabilidades, controls) => (latest) => {
                         if (p1BarState === BarState.Stop) {
                             const [critico, fallo, acierto] =
@@ -75,6 +76,7 @@ export default function () {
                 <BarraProbabilidad
                     reverse
                     score={p2Score}
+                    state={p2BarState}
                     handleChange={(probabilidades, controls) => (latest) => {
                         if (p2BarState === BarState.Stop) {
                             const [critico, fallo, acierto] =

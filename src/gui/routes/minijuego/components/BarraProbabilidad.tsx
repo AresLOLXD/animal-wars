@@ -1,3 +1,4 @@
+import { BarState } from "@store/defaultStore";
 import {
     AnimationControls,
     motion,
@@ -19,9 +20,11 @@ export default function ({
     reverse,
     score,
     handleChange,
+    state,
 }: {
     reverse?: boolean;
     score: number;
+    state: BarState;
     handleChange: (
         probabilidades: MutableRefObject<number[]>,
         controls: AnimationControls
@@ -58,7 +61,7 @@ export default function ({
                 ease: "linear",
             },
         });
-    }, []);
+    }, [state]);
 
     useEffect(() => {
         if (score <= 3 || score >= -3) {

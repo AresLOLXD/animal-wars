@@ -10,7 +10,7 @@ const config: Types.Core.GameConfig = {
     scene: [
         BootLoader,
         //TODO: Quitar el simon dice y poner el menu principal
-        //MainMenu,
+        MainMenu,
         SimonSays,
         SPS,
         BattleShip
@@ -21,7 +21,7 @@ const config: Types.Core.GameConfig = {
         arcade: {
             debug: true,
             gravity: {
-                y: 9.81
+                y: 9.81,
             },
         },
     },

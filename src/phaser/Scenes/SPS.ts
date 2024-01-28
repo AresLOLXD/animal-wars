@@ -9,9 +9,9 @@ import { getStore, setStore, subscribeStore } from "@store/index";
 import { Scene, Input, Animations } from "phaser";
 
 enum ValueSPS {
-    PIEDRA = "Piedra",
-    PAPEL = "Papel",
-    TIJERA = "Tijera"
+    PIEDRA = "Pollo",
+    PAPEL = "Corneta",
+    TIJERA = "Flauta"
 }
 
 enum States {
@@ -67,6 +67,9 @@ export class SPS extends Scene {
     turn_to_critical: number = 0;
 
     state: States = States.Beginning;
+    show_results: boolean = true;
+    show_result_player_one: boolean = true;
+    show_result_player_two: boolean = true;
 
     constructor() {
         super({
@@ -194,6 +197,9 @@ export class SPS extends Scene {
     playersElection() {
         this.listen_player_one_keys = true;
         this.listen_player_two_keys = true;
+        this.show_results = true;
+        this.show_result_player_one = true;
+        this.show_result_player_two = true;
         this.time.delayedCall(500, () => {
             // console.log("Estado: " + this.state + " " + States[this.state]);
             this.state = States.ListeningPlayer;
@@ -416,13 +422,44 @@ export class SPS extends Scene {
     }
 
     evaluateResult() {
-        if (this.player_one_values != null && this.player_two_values != null) {
+        if (this.show_results){
+            if(this.show_result_player_one){     
+                this.show_result_player_one = false;
+                this.time.delayedCall(100, () =>{
+                    this.drawText(
+                        "" + this.player_one_values,
+                        this.player_one_positionX,
+                        this.player_one!.y - 140,
+                        TIME_TEXT_PLAYER + 200
+                    );
+                    this.sound.play(""+this.player_one_values);
+                });         
+            }
+            if(this.show_result_player_two){
+                this.show_result_player_two = false;
+                this.time.delayedCall(2100, () =>{
+                    this.drawText(
+                        "" + this.player_two_values,
+                        this.player_two_positionX,
+                        this.player_two!.y - 140,
+                        TIME_TEXT_PLAYER + 200
+                    );
+                    this.sound.play(""+this.player_two_values);
+                }); 
+            }
+            if(!this.show_result_player_one && !this.show_result_player_two){
+                this.time.delayedCall(5000, () => {
+                    this.show_results = false;
+                });
+            }
+        } else if (this.player_one_values != null && this.player_two_values != null) {
             if (this.player_one_values == this.player_two_values) {
                 this.drawText("Empate", this.half_width, this.half_height, TIME_TEXT_PLAYER);
             }
             //Gana el jugador 1
             if (this.player_one_values == ValueSPS.PAPEL && this.player_two_values == ValueSPS.PIEDRA) {
                 this.score_player_one++;
+                
             }
             if (this.player_one_values == ValueSPS.PIEDRA && this.player_two_values == ValueSPS.TIJERA) {
                 this.score_player_one++;
@@ -443,8 +480,9 @@ export class SPS extends Scene {
             this.restartValues();
             this.redrawTextPoints();
             
-            this.time.delayedCall(500, () => {
+            this.time.delayedCall(1000, () => {
                 console.log("Estado: " + this.state + " " + States[this.state]);
+                ;
                 this.state = States.PostEvaluateTurn;
                 console.log("Estado: " + this.state + " " + States[this.state]);
             });

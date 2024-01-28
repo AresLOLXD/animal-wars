@@ -64,6 +64,9 @@ export class BootLoader extends Scene {
         this.load.audio("animal_down", "Audios/Animal_Aba.mp3");
         this.load.audio("animal_left", "Audios/Animal_Izq.mp3");
         this.load.audio("animal_right", "Audios/Animal_Der.mp3");
+        this.load.audio("Corneta", "Audios/clown-horn.mp3");
+        this.load.audio("Pollo", "Audios/rubber_chicken.wav");
+        this.load.audio("Flauta","Audios/slide_whistle.wav");
 
         this.load.on(Loader.Events.PROGRESS, (value: number) => {
             //Por si queremos poner una barra de carga

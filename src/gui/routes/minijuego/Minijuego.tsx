@@ -1,7 +1,9 @@
+import { game } from "@phaser/index";
 import { BarResult, BarState } from "@store/defaultStore";
 import { setStore, syncStore } from "@store/index";
-import { useSyncExternalStore } from "react";
-import { Outlet } from "react-router-dom";
+import { motion } from "framer-motion";
+import { useEffect, useSyncExternalStore } from "react";
+import { Outlet, useNavigate } from "react-router-dom";
 import BarraProbabilidad, { barWidth } from "./components/BarraProbabilidad";
 import useGameTimer from "./hooks/useGameTimer";
 
@@ -119,12 +121,66 @@ function BarraP2() {
 function Timer() {
     const { timerValue } = useGameTimer();
 
-    return <>{timerValue}</>;
+    return (
+        <div
+            style={{
+                display: "flex",
+                justifyContent: "center",
+                flexDirection: "column",
+                alignItems: "center",
+            }}
+        >
+            <motion.div
+                style={{
+                    position: "relative",
+                    borderRadius: "1.2rem",
+                    fontFamily: "Sancreek",
+                    fontSize: "1rem",
+                    textAlign: "center",
+                    cursor: "pointer",
+                }}
+            >
+                <motion.div
+                    style={{
+                        padding: "0.6rem",
+                        borderRadius: "inherit",
+                        position: "relative",
+                        zIndex: 3,
+                        background: "#E8000E",
+                        boxShadow: "2px 2px 2px 2px #BDA800",
+                    }}
+                >
+                    <motion.div
+                        style={{
+                            background: "#FDED6E",
+                            padding: "0.5rem 2rem",
+                            borderRadius: "1rem",
+                            color: "#552B29",
+                        }}
+                    >
+                        {(timerValue / 1000).toFixed(2).padStart(5, "0")}
+                    </motion.div>
+                </motion.div>
+            </motion.div>
+        </div>
+    );
 }
 
 export default function () {
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        setTimeout(() => {
+            game.scene.getScenes(true).forEach((scene) => {
+                if (!["SimonSays"].includes(scene.scene.key)) {
+                    navigate("/");
+                }
+            });
+        }, 200);
+    }, []);
+
     return (
-        <div
+        <motion.div
             style={{
                 display: "flex",
                 flexDirection: "column",
@@ -132,9 +188,16 @@ export default function () {
                 width: "100%",
                 height: "100%",
             }}
+            initial={{ opacity: 0 }}
+            animate={{
+                opacity: 1,
+                transition: {
+                    delay: 0.2,
+                },
+            }}
         >
+            <Timer />
             <div>
-                <Timer />
                 <Outlet />
             </div>
             <div
@@ -147,6 +210,6 @@ export default function () {
                 <BarraP1 />
                 <BarraP2 />
             </div>
-        </div>
+        </motion.div>
     );
 }

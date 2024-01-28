@@ -1,6 +1,6 @@
 import { AUTO, Game, Types } from "phaser";
-import { BootLoader, MainMenu, SimonSays, SPS } from "./Scenes";
-export {config as gameConfig};
+import { BootLoader, MainMenu, SimonSays } from "./Scenes";
+export { config as gameConfig };
 
 const config: Types.Core.GameConfig = {
     type: AUTO,
@@ -10,16 +10,16 @@ const config: Types.Core.GameConfig = {
     scene: [
         BootLoader,
         //TODO: Quitar el simon dice y poner el menu principal
-        //MainMenu,
+        MainMenu,
         SimonSays,
-            ],
+    ],
     parent: "phaser-content",
     physics: {
         default: "arcade",
         arcade: {
             debug: true,
             gravity: {
-                y: 9.81
+                y: 9.81,
             },
         },
     },

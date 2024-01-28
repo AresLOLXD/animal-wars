@@ -5,4 +5,4 @@ export const TIME_BATLLE_SHIP_PLAYER = 5000;
 export const LOG_BASE = 200;
 export const TIME_CHECK_KEY_PRESSED = 700;
 export const TIME_TEXT_PLAYER = 500;
-export const TURNS_TO_CRITIC = 1;
+export const TURNS_TO_CRITIC = 4;

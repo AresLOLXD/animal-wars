@@ -4,3 +4,4 @@ export * from "./Garment";
 export * from "./Clothes";
 export * from "./Pay";
 export * from "./Background";
+export * from "./Head";

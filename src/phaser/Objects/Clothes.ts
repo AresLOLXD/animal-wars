@@ -1,11 +1,13 @@
-import { Garment } from "@phaser/Objects";
+import { Garment, Head } from "@phaser/Objects";
 import { SCALE_FACTOR } from "@phaser/Util";
 import { Animations } from "phaser";
 
 export class Clothes {
     clothes: Garment[];
-    constructor(scene: Phaser.Scene, clothes: Garment[]) {
+    head: Head | null = null;
+    constructor(scene: Phaser.Scene, clothes: Garment[]/*, head: Head*/) {
         this.clothes = clothes;
+        //this.head = head;
         this.clothes.forEach((clothe) => {
             scene.add.existing(clothe);
             clothe.setScale(SCALE_FACTOR);
@@ -19,6 +21,10 @@ export class Clothes {
         return this.clothes;
     }
 
+    getHead(){
+        return this.head;
+    }
+
     playAnimationAll(animation: string) {
         this.clothes.forEach((clothe) => {
             clothe
@@ -26,6 +32,9 @@ export class Clothes {
                 .on(Animations.Events.ANIMATION_COMPLETE, () => {
                     clothe.play("idle_" + clothe.texture.key);
                 });
+        });
+        this.head!.play(animation + "_" + this.head!.texture.key).on(Animations.Events.ANIMATION_COMPLETE, () => {
+            this.head!.play("idle_" + this.head!.texture.key);
         });
     }
     removeAllGarments() {
@@ -38,5 +47,6 @@ export class Clothes {
         this.clothes.forEach((clothe) => {
             clothe.setFlipX(flip);
         });
+        this.head?.setFlipX(flip);
     }
 }

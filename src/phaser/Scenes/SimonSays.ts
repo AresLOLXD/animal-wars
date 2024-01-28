@@ -1,4 +1,4 @@
-import { Clothes, Garment, Player, Simon, Backgrounds } from "@phaser/Objects";
+import { Clothes, Garment, Player, Simon, Backgrounds, Pay } from "@phaser/Objects";
 import {
     SCALE_FACTOR,
     TIME_CHECK_KEY_PRESSED,

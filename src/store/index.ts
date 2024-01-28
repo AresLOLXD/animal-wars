@@ -19,6 +19,9 @@ const setStore = <T extends keyof Store>(key: T, value: Store[T]) => {
     }
 };
 
+//setStore("p1Asset", "oso");
+
+
 const subscribeStore = <T extends Store[keyof Store] = Store[keyof Store]>(
     key: keyof Store,
     callback: StoreCallback<T>

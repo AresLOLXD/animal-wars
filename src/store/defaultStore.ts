@@ -34,12 +34,18 @@ const defaultStore = {
     // P1
     p1Name: "P1",
     p1Asset: "capibara",
+    p1PrendaTop: "",
+    p1PrendaMiddle: "",
+    p1PrendaBottom: "",
     p1Score: 0,
     p1BarState: BarState.Active,
     p1BarResult: BarResult.Acierto,
     // P2
     p2Name: "P2",
     p2Asset: "oso",
+    p2PrendaTop: "",
+    p2PrendaMiddle: "",
+    p2PrendaBottom: "",
     p2Score: 0,
     p2BarState: BarState.Active,
     p2BarResult: BarResult.Acierto,

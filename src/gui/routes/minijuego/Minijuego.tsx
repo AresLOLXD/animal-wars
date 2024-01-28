@@ -83,22 +83,22 @@ export default function () {
                                 probabilidades.current;
 
                             let resultado: BarResult = BarResult.Critico;
-                            const positionCritico = barWidth * critico;
-                            const positionFallo = barWidth * fallo;
-                            const positionAcierto = barWidth * acierto;
+                            const positionCritico = -barWidth * critico;
+                            const positionFallo = -barWidth * fallo;
+                            const positionAcierto = -barWidth * acierto;
 
                             const primerCritico = positionCritico;
                             const primerFallo = positionFallo + primerCritico;
                             const primerAcierto = positionAcierto + primerFallo;
                             const segundoFallo = positionFallo + primerAcierto;
 
-                            if (latest <= primerCritico) {
+                            if (latest >= primerCritico) {
                                 resultado = BarResult.Critico;
-                            } else if (latest <= primerFallo) {
+                            } else if (latest >= primerFallo) {
                                 resultado = BarResult.Fallo;
-                            } else if (latest <= primerAcierto) {
+                            } else if (latest >= primerAcierto) {
                                 resultado = BarResult.Acierto;
-                            } else if (latest <= segundoFallo) {
+                            } else if (latest >= segundoFallo) {
                                 resultado = BarResult.Fallo;
                             } else {
                                 resultado = BarResult.Critico;

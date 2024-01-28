@@ -1,4 +1,4 @@
-import { Player, Simon } from "@phaser/Objects";
+import { Clothes, Garment, Player, Simon } from "@phaser/Objects";
 import {
     SCALE_FACTOR,
     TIME_CHECK_KEY_PRESSED,
@@ -73,6 +73,9 @@ export class SimonSays extends Scene {
     timeLeft: number = 0;
     points_player_one_text: Phaser.GameObjects.Text | null = null;
     points_player_two_text: Phaser.GameObjects.Text | null = null;
+
+    clothes_player_one: Clothes[] = [];
+    clothes_player_two: Clothes[] = [];
 
     constructor() {
         super({
@@ -159,6 +162,40 @@ export class SimonSays extends Scene {
             }
         );
         this.rounds_played_text.setOrigin(0.5);
+
+        this.clothes_player_one = [
+            new Clothes(this, [
+                new Garment(
+                    this,
+                    this.player_one_positionX,
+                    this.player_one!.y,
+                    "pantalon_p1"
+                ),
+                new Garment(
+                    this,
+                    this.player_one_positionX,
+                    this.player_one!.y,
+                    "overol_p1"
+                ),
+            ]),
+        ];
+
+        this.clothes_player_two = [
+            new Clothes(this, [
+                new Garment(
+                    this,
+                    this.player_two_positionX,
+                    this.player_two!.y,
+                    "pantalon_p2"
+                ),
+                new Garment(
+                    this,
+                    this.player_two_positionX,
+                    this.player_two!.y,
+                    "overol_p2"
+                ),
+            ]),
+        ];
     }
 
     redrawTextPoints() {
@@ -316,6 +353,10 @@ export class SimonSays extends Scene {
                     1000
                 );
             }
+
+            setStore("p1Score", this.score_player_one);
+            setStore("p2Score", this.score_player_two);
+
             this.time.delayedCall(1000, () => {
                 if (this.rounds_played % 9 === 0) {
                     this.state = States.CriticalTurn;
@@ -473,6 +514,9 @@ export class SimonSays extends Scene {
                     this.player_one!.anims.play("idle", true);
                 }
             );
+            this.clothes_player_one.forEach((clothes) => {
+                clothes.playAnimationAll("jump");
+            });
             this.drawText(
                 "Arriba",
                 this.player_one_positionX,
@@ -492,6 +536,9 @@ export class SimonSays extends Scene {
                     this.player_one!.anims.play("idle", true);
                 }
             );
+            this.clothes_player_one.forEach((clothes) => {
+                clothes.playAnimationAll("crouch");
+            });
             this.drawText(
                 "Abajo",
                 this.player_one_positionX,
@@ -561,6 +608,9 @@ export class SimonSays extends Scene {
                     this.player_two!.anims.play("idle", true);
                 }
             );
+            this.clothes_player_two.forEach((clothes) => {
+                clothes.playAnimationAll("jump");
+            });
             this.drawText(
                 "Arriba",
                 this.player_two_positionX,
@@ -580,6 +630,9 @@ export class SimonSays extends Scene {
                     this.player_two!.anims.play("idle", true);
                 }
             );
+            this.clothes_player_two.forEach((clothes) => {
+                clothes.playAnimationAll("crouch");
+            });
             this.drawText(
                 "Abajo",
                 this.player_two_positionX,
@@ -599,6 +652,9 @@ export class SimonSays extends Scene {
                     this.player_two!.anims.play("idle", true);
                 }
             );
+            this.clothes_player_two.forEach((clothes) => {
+                clothes.playAnimationAll("left");
+            });
             this.drawText(
                 "Izquierda",
                 this.player_two_positionX,
@@ -615,13 +671,22 @@ export class SimonSays extends Scene {
             if (!this.player_two!.flipX) {
                 console.log("Flip");
                 this.player_two!.setFlipX(true);
+                this.clothes_player_two.forEach((clothes) => {
+                    clothes.setFlipXAll(true);
+                });
             }
+            this.clothes_player_two.forEach((clothes) => {
+                clothes.playAnimationAll("left");
+            });
             this.player_two!.anims.play("left", false).on(
                 Animations.Events.ANIMATION_COMPLETE,
                 () => {
                     if (this.player_two!.flipX) {
                         console.log("Reflip");
                         this.player_two!.setFlipX(false);
+                        this.clothes_player_two.forEach((clothes) => {
+                            clothes.setFlipXAll(false);
+                        });
                     }
                     this.player_two!.anims.play("idle", true);
                 }
@@ -644,7 +709,16 @@ export class SimonSays extends Scene {
             this.checkPlayerTwoKeys();
         }
     }
-    criticalTurn() {}
+    criticalTurn() {
+        this.clothes_player_one.forEach((clothes) => {
+            clothes.removeAllGarments();
+        });
+        this.clothes_player_two.forEach((clothes) => {
+            clothes.removeAllGarments();
+        });
+        this.clothes_player_one.shift();
+        this.clothes_player_two.shift();
+    }
     gameOver() {}
 
     getRandomValue(): ValueSimon {

@@ -27,7 +27,7 @@ const router = createHashRouter([
                 ],
             },
             {
-                path: "modal",
+                path: "modal/:minijuego",
                 element: <Modal />,
             },
         ],

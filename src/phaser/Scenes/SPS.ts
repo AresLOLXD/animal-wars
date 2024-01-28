@@ -309,21 +309,20 @@ export class SPS extends Scene {
                 this.player_two!.y - 100,
                 TIME_TEXT_PLAYER
             );
-            // this.getAnswer(ValueSimon.UP, false);
         } else if (
             this.input.keyboard!.checkDown(
                 this.keys_player_two!.down,
                 TIME_CHECK_KEY_PRESSED
             )
         ) {
-            this.player_two!.anims.play("crouch", false).on(
+            this.player_two!.anims.play("jump", false).on(
                 Animations.Events.ANIMATION_COMPLETE,
                 () => {
                     this.player_two!.anims.play("idle", true);
                 }
             );
             this.clothes_player_two.forEach((clothes) => {
-                clothes.playAnimationAll("crouch");
+                clothes.playAnimationAll("jump");
             });
             this.drawText(
                 "Abajo",
@@ -331,21 +330,21 @@ export class SPS extends Scene {
                 this.player_two!.y - 100,
                 TIME_TEXT_PLAYER
             );
-            // this.getAnswer(ValueSimon.DOWN, false);
+            this.getAnswer(ValueSPS.PAPEL, false);
         } else if (
             this.input.keyboard!.checkDown(
                 this.keys_player_two!.left,
                 TIME_CHECK_KEY_PRESSED
             )
         ) {
-            this.player_two!.anims.play("left", false).on(
+            this.player_two!.anims.play("jump", false).on(
                 Animations.Events.ANIMATION_COMPLETE,
                 () => {
                     this.player_two!.anims.play("idle", true);
                 }
             );
             this.clothes_player_two.forEach((clothes) => {
-                clothes.playAnimationAll("left");
+                clothes.playAnimationAll("jump");
             });
             this.drawText(
                 "Izquierda",
@@ -353,43 +352,29 @@ export class SPS extends Scene {
                 this.player_two!.y - 100,
                 TIME_TEXT_PLAYER
             );
-            // this.getAnswer(ValueSimon.LEFT, false);
+            this.getAnswer(ValueSPS.PIEDRA, false);
         } else if (
             this.input.keyboard!.checkDown(
                 this.keys_player_two!.right,
                 TIME_CHECK_KEY_PRESSED
             )
         ) {
-            if (!this.player_two!.flipX) {
-                console.log("Flip");
-                this.player_two!.setFlipX(true);
-                this.clothes_player_two.forEach((clothes) => {
-                    clothes.setFlipXAll(true);
-                });
-            }
-            this.clothes_player_two.forEach((clothes) => {
-                clothes.playAnimationAll("left");
-            });
-            this.player_two!.anims.play("left", false).on(
+            this.player_two!.anims.play("jump", false).on(
                 Animations.Events.ANIMATION_COMPLETE,
                 () => {
-                    if (this.player_two!.flipX) {
-                        console.log("Reflip");
-                        this.player_two!.setFlipX(false);
-                        this.clothes_player_two.forEach((clothes) => {
-                            clothes.setFlipXAll(false);
-                        });
-                    }
                     this.player_two!.anims.play("idle", true);
                 }
             );
+            this.clothes_player_two.forEach((clothes) => {
+                clothes.playAnimationAll("jump");
+            });
             this.drawText(
                 "Derecha",
                 this.player_two_positionX,
                 this.player_two!.y - 100,
                 TIME_TEXT_PLAYER
             );
-            // this.getAnswer(ValueSimon.RIGHT, false);
+            this.getAnswer(ValueSPS.TIJERA, false);
         }
     }
 

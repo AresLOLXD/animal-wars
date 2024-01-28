@@ -7,6 +7,7 @@ import MinijuegoIndex from "@gui/routes/minijuego/Index";
 import Minijuego from "@gui/routes/minijuego/Minijuego";
 import "normalize.css/normalize.css";
 import { RouterProvider, createHashRouter } from "react-router-dom";
+import { gameConfig } from "./phaser";
 
 const router = createHashRouter([
     {
@@ -14,7 +15,7 @@ const router = createHashRouter([
         element: <Root />,
         children: [
             {
-                path: "mainmenu",
+                index: true,
                 element: <MainMenu />,
             },
             {
@@ -58,8 +59,8 @@ function App() {
         >
             <div
                 style={{
-                    width: "100%",
-                    height: "100%",
+                    width: gameConfig.width,
+                    height: gameConfig.height,
                     display: "flex",
                     flexDirection: "column",
                     padding: "1rem",

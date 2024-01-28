@@ -1,3 +1,4 @@
+import { gameConfig } from "@phaser/index";
 import { BarState } from "@store/defaultStore";
 import {
     AnimationControls,
@@ -9,12 +10,16 @@ import {
 import { MutableRefObject, useEffect, useRef, useState } from "react";
 
 const defaultSpeed = 0.2;
-export const barWidth = 400;
+export const barWidth = +(gameConfig.width ?? 600) * 0.4;
 export enum DefaultProbs {
     Critico = 50,
     Fallo = 30,
     Acierto = 20,
 }
+
+const colorCritico = "red";
+const colorFallo = "#FFBF00";
+const colorAcierto = "green";
 
 export default function ({
     reverse,
@@ -95,14 +100,25 @@ export default function ({
     }, [score]);
 
     return (
-        <>
+        <motion.div
+            style={{
+                padding: "0.6rem",
+                borderRadius: "24px",
+                position: "relative",
+                background: "white",
+                boxShadow: "2px 2px 0px 2px black",
+                border: "solid 1px black",
+            }}
+        >
             <motion.div
                 style={{
                     width: barWidth,
-                    height: "64px",
+                    height: "24px",
                     display: "flex",
                     flexDirection: reverse ? "row-reverse" : "row",
                     position: "relative",
+                    borderRadius: "inherit",
+                    overflow: "hidden",
                 }}
             >
                 <motion.div
@@ -122,21 +138,22 @@ export default function ({
                 <motion.div
                     style={{
                         height: "100%",
-                        backgroundColor: "tomato",
+                        backgroundColor: colorCritico,
                         zIndex: 1,
                         width: barWidth * porcentajeFalloCritico,
+                        borderRadius: reverse
+                            ? "0 12px 12px 0"
+                            : "12px 0 0 12px",
                     }}
                     animate={{
                         width: barWidth * porcentajeFalloCritico,
                     }}
                     transition={{ type: "spring" }}
-                >
-                    critico
-                </motion.div>
+                ></motion.div>
                 <motion.div
                     style={{
                         height: "100%",
-                        backgroundColor: "steelblue",
+                        backgroundColor: colorFallo,
                         zIndex: 1,
                         width: barWidth * porcentajeFallo,
                     }}
@@ -144,13 +161,11 @@ export default function ({
                         width: barWidth * porcentajeFallo,
                     }}
                     transition={{ type: "spring" }}
-                >
-                    fallo
-                </motion.div>
+                ></motion.div>
                 <motion.div
                     style={{
                         height: "100%",
-                        backgroundColor: "turquoise",
+                        backgroundColor: colorAcierto,
                         zIndex: 1,
                         width: barWidth * porcentajeAcierto,
                     }}
@@ -158,13 +173,11 @@ export default function ({
                         width: barWidth * porcentajeAcierto,
                     }}
                     transition={{ type: "spring" }}
-                >
-                    acierto
-                </motion.div>
+                ></motion.div>
                 <motion.div
                     style={{
                         height: "100%",
-                        backgroundColor: "steelblue",
+                        backgroundColor: colorFallo,
                         zIndex: 1,
                         width: barWidth * porcentajeFallo,
                     }}
@@ -172,24 +185,23 @@ export default function ({
                         width: barWidth * porcentajeFallo,
                     }}
                     transition={{ type: "spring" }}
-                >
-                    fallo
-                </motion.div>
+                ></motion.div>
                 <motion.div
                     style={{
                         height: "100%",
-                        backgroundColor: "tomato",
+                        backgroundColor: colorCritico,
                         zIndex: 1,
                         width: barWidth * porcentajeFalloCritico,
+                        borderRadius: reverse
+                            ? "12px 0 0 12px"
+                            : "0 12px 12px 0",
                     }}
                     animate={{
                         width: barWidth * porcentajeFalloCritico,
                     }}
                     transition={{ type: "spring" }}
-                >
-                    critico
-                </motion.div>
+                ></motion.div>
             </motion.div>
-        </>
+        </motion.div>
     );
 }

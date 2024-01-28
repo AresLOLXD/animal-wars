@@ -12,27 +12,34 @@ export default function () {
 
     useEffect(() => {
         if (timerState === TimerState.Start) {
-            setStore("timerState", TimerState.Active);
-            setTimerValue(timerMax);
-            setStore("timerValue", timerMax);
-            interval.current = setInterval(() => {
-                setTimerValue((v) => {
-                    const newVal = v - 100;
+            (async () => {
+                setStore("timerState", TimerState.Active);
+                setTimerValue(timerMax);
+                setStore("timerValue", timerMax);
 
-                    if (v <= 100) {
-                        clearInterval(interval.current);
-                        setTimeout(() => {
-                            setStore("timerState", TimerState.Stop);
-                        }, 80);
+                await new Promise((s) => {
+                    setTimeout(() => s(null), 2600);
+                });
+
+                interval.current = setInterval(() => {
+                    setTimerValue((v) => {
+                        const newVal = v - 100;
+
+                        if (v <= 100) {
+                            clearInterval(interval.current);
+                            setTimeout(() => {
+                                setStore("timerState", TimerState.Stop);
+                            }, 80);
+
+                            setStore("timerValue", newVal);
+                            return 0;
+                        }
 
                         setStore("timerValue", newVal);
-                        return 0;
-                    }
-
-                    setStore("timerValue", newVal);
-                    return newVal;
-                });
-            }, 100);
+                        return newVal;
+                    });
+                }, 100);
+            })();
         }
 
         return () => {};

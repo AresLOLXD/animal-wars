@@ -1,13 +1,24 @@
-import { gameConfig } from "@phaser/index";
+import { game, gameConfig } from "@phaser/index";
 import { Variants, motion } from "framer-motion";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import styled from "styled-components";
 
 let wg = Number(gameConfig.width);
 let hg = Number(gameConfig.height);
 
+// ! Navegacion desde Modal.tsx:
+// ! En los Objetos de controles agrego el campo "navegar" y "escenaPhaser".
+// ! Al hacer click en el boton continuar React navegar hacie la url configurada
+// ! y en Phaser se activa la escena que tenga el "key" del mismo nombre en su
+// ! constructor.
+
+// ! General navega hacia Seleccionar de personajes - aun no hay escena ni ruta
+// ! SimonDice navega hacia "/minijuego" e inicia la escena "SimonSays"
+
 const Controles = {
     General: {
+        navegar: "",
+        escenaPhaser: null,
         titulo: "General",
         J1: {
             izquierda: "key-a",
@@ -25,6 +36,8 @@ const Controles = {
         },
     },
     SimonDice: {
+        navegar: "/minijuego",
+        escenaPhaser: "SimonSays",
         titulo: "Simón dice",
         J1: {
             izquierda: "key-a",
@@ -421,29 +434,45 @@ export default function () {
                         )}
                     </Column>
                 </RowCenter>
-                <RowCenter>
-                    <motion.button
-                        whileHover={{
-                            background: "#DCD38D",
-                            transition: {
-                                duration: 0.2,
-                                type: "tween",
-                                ease: "linear",
-                            },
-                        }}
-                        style={{
-                            border: "none",
-                            borderRadius: "10px",
-                            background: "#D4B20B",
-                            padding: "10px",
-                            margin: "5px",
-                            fontSize: "0.75em",
-                            alignSelf: "flex-end",
-                        }}
-                    >
-                        Continuar
-                    </motion.button>
-                </RowCenter>
+                <Link
+                    to={controles.navegar}
+                    style={{ textDecoration: "none" }}
+                    onClick={() => {
+                        if (controles.escenaPhaser) {
+                            // TODO: Cambiar escena phaser
+                            game.scene.getScenes(true).forEach((scene) => {
+                                scene.scene.setActive(false);
+                            });
+                            game.scene
+                                .getScene(controles.escenaPhaser)
+                                .scene.start();
+                        }
+                    }}
+                >
+                    <RowCenter>
+                        <motion.button
+                            whileHover={{
+                                background: "#DCD38D",
+                                transition: {
+                                    duration: 0.2,
+                                    type: "tween",
+                                    ease: "linear",
+                                },
+                            }}
+                            style={{
+                                border: "none",
+                                borderRadius: "10px",
+                                background: "#D4B20B",
+                                padding: "10px",
+                                margin: "5px",
+                                fontSize: "0.75em",
+                                alignSelf: "flex-end",
+                            }}
+                        >
+                            Continuar
+                        </motion.button>
+                    </RowCenter>
+                </Link>
             </motion.div>
         </Container>
     );

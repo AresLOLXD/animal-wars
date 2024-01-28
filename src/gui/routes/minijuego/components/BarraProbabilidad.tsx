@@ -1,4 +1,9 @@
-import { motion, useMotionValue, useMotionValueEvent } from "framer-motion";
+import {
+    motion,
+    useAnimationControls,
+    useMotionValue,
+    useMotionValueEvent,
+} from "framer-motion";
 import { useEffect, useState } from "react";
 
 const defaultSpeed = 0.2;
@@ -24,13 +29,27 @@ export default function ({
     const porcentajeAcierto = acierto / totalProbabilidades;
 
     const x = useMotionValue(0);
+    const controls = useAnimationControls();
 
     useMotionValueEvent(x, "change", (latest) => {
-        if (latest > barWidth / 2) {
-            // x.stop();
-            // console.log("STOP", latest);
+        if (latest >= barWidth / 2) {
+            controls.stop();
         }
     });
+
+    useEffect(() => {
+        controls.start({
+            x: reverse ? -barWidth : barWidth,
+            transition: {
+                duration: speed,
+                repeat: Infinity,
+                type: "tween",
+                repeatType: "reverse",
+                repeatDelay: 0.237,
+                ease: "linear",
+            },
+        });
+    }, []);
 
     useEffect(() => {
         if (score <= 3 || score >= -3) {
@@ -71,9 +90,6 @@ export default function ({
                     flexDirection: reverse ? "row-reverse" : "row",
                     position: "relative",
                 }}
-                animate={{
-                    width: barWidth,
-                }}
             >
                 <motion.div
                     style={{
@@ -87,23 +103,14 @@ export default function ({
                     initial={{
                         x: 0,
                     }}
-                    animate={{
-                        x: reverse ? -barWidth : barWidth,
-                        transition: {
-                            duration: speed,
-                            repeat: Infinity,
-                            type: "tween",
-                            repeatType: "reverse",
-                            repeatDelay: 0.237,
-                            ease: "linear",
-                        },
-                    }}
+                    animate={controls}
                 ></motion.div>
                 <motion.div
                     style={{
                         height: "100%",
                         backgroundColor: "tomato",
                         zIndex: 1,
+                        width: barWidth * porcentajeFalloCritico,
                     }}
                     animate={{
                         width: barWidth * porcentajeFalloCritico,
@@ -117,6 +124,7 @@ export default function ({
                         height: "100%",
                         backgroundColor: "steelblue",
                         zIndex: 1,
+                        width: barWidth * porcentajeFallo,
                     }}
                     animate={{
                         width: barWidth * porcentajeFallo,
@@ -128,9 +136,9 @@ export default function ({
                 <motion.div
                     style={{
                         height: "100%",
-                        width: "30%",
                         backgroundColor: "turquoise",
                         zIndex: 1,
+                        width: barWidth * porcentajeAcierto,
                     }}
                     animate={{
                         width: barWidth * porcentajeAcierto,
@@ -144,6 +152,7 @@ export default function ({
                         height: "100%",
                         backgroundColor: "steelblue",
                         zIndex: 1,
+                        width: barWidth * porcentajeFallo,
                     }}
                     animate={{
                         width: barWidth * porcentajeFallo,
@@ -157,6 +166,7 @@ export default function ({
                         height: "100%",
                         backgroundColor: "tomato",
                         zIndex: 1,
+                        width: barWidth * porcentajeFalloCritico,
                     }}
                     animate={{
                         width: barWidth * porcentajeFalloCritico,

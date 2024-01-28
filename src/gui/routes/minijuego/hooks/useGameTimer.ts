@@ -18,7 +18,7 @@ export default function () {
                 setStore("timerValue", timerMax);
 
                 await new Promise((s) => {
-                    setTimeout(() => s(null), 2000);
+                    setTimeout(() => s(null), 2600);
                 });
 
                 interval.current = setInterval(() => {

@@ -1,4 +1,4 @@
-import { Player,Clothes } from "@phaser/Objects";
+import { Player, Clothes } from "@phaser/Objects";
 import {
     calculateDimensions,
     SCALE_FACTOR,
@@ -51,7 +51,7 @@ export class SPS extends Scene {
 
     listen_player_one_keys: boolean = false;
     listen_player_two_keys: boolean = false;
-    
+
     timeLeft: number = 0;
     points_player_one_text: Phaser.GameObjects.Text | null = null;
     points_player_two_text: Phaser.GameObjects.Text | null = null;
@@ -61,6 +61,7 @@ export class SPS extends Scene {
 
     score_player_one: number = 0;
     score_player_two: number = 0;
+    turn_to_critical: number = 0;
 
     state: States = States.Beginning;
 
@@ -76,7 +77,7 @@ export class SPS extends Scene {
             calculateDimensions(this);
 
         this.player_one_positionX = 100;
-        this.player_two_positionX = this.width - 100;
+        this.player_two_positionX = this.width - 140;
         this.player_one = new Player(
             this,
             this.player_one_positionX,
@@ -142,12 +143,12 @@ export class SPS extends Scene {
         this.drawPermanentText(
             getStore<string>("p1Name"),
             this.player_one_positionX,
-            this.player_one!.y - 80
+            this.player_one!.y - 100
         );
         this.drawPermanentText(
             getStore<string>("p2Name"),
             this.player_two_positionX,
-            this.player_two!.y - 80
+            this.player_two!.y - 100
         );
     }
 
@@ -167,8 +168,8 @@ export class SPS extends Scene {
                 // console.log("EvaluateTurn");
                 break;
             case States.PostEvaluateTurn:
+                // console.log("PostEvaluateTurn");
                 this.postEvaluate();
-                console.log("PostEvaluateTurn");
                 break;
             case States.CriticalTurn:
                 console.log("CriticalTurn");
@@ -181,26 +182,31 @@ export class SPS extends Scene {
         }
     }
 
-    playersElection(){
+    playersElection() {
         this.listen_player_one_keys = true;
         this.listen_player_two_keys = true;
-        this.state = States.ListeningPlayer;
+        this.time.delayedCall(500, () => {
+            // console.log("Estado: " + this.state + " " + States[this.state]);
+            this.state = States.ListeningPlayer;
+            // console.log("Estado: " + this.state + " " + States[this.state]);
+        });
+        
     }
 
     getAnswer(value: ValueSPS, isPlayerOne: boolean) {
-        if ( isPlayerOne && this.player_one_values == null ) {
+        if (isPlayerOne && this.player_one_values == null) {
             this.player_one_values = value;
-            console.log("Valor jugador 1 "+this.player_one_values);
+            console.log("Valor jugador 1 " + this.player_one_values);
             this.listen_player_one_keys = false;
             //this.listen_player_one_keys = this.compareAnswers(this.player_one_values);
             //return this.listen_player_one_keys;
-        } else if ( !isPlayerOne && this.player_two_values == null ) {
+        } else if (!isPlayerOne && this.player_two_values == null) {
             this.player_two_values = value;
-            console.log("Valor jugador 2 "+this.player_two_values);
+            console.log("Valor jugador 2 " + this.player_two_values);
             this.listen_player_two_keys = false;
             //this.listen_player_two_keys = this.compareAnswers(this.player_two_values);
             //return this.listen_player_two_keys;
-        }       
+        }
     }
 
     checkPlayerOneKeys() {
@@ -219,80 +225,80 @@ export class SPS extends Scene {
             this.clothes_player_one.forEach((clothes) => {
                 clothes.playAnimationAll("jump");
             });
-            this.drawText(
-                "Arriba",
-                this.player_one_positionX,
-                this.player_one!.y - 90,
-                TIME_TEXT_PLAYER
-            );            
-        } else 
-        if (
-            this.input.keyboard!.checkDown(
-                this.keys_player_one!.down,
-                TIME_CHECK_KEY_PRESSED
-            )
-        ) {
-            this.player_one!.anims.play("jump", false).on(
-                Animations.Events.ANIMATION_COMPLETE,
-                () => {
-                    this.player_one!.anims.play("idle", true);
-                }
-            );
-            this.clothes_player_one.forEach((clothes) => {
-                clothes.playAnimationAll("jump");
-            });
-            this.drawText(
-                "Abajo",
-                this.player_one_positionX,
-                this.player_one!.y - 100,
-                TIME_TEXT_PLAYER
-            );
-            this.getAnswer(ValueSPS.PAPEL, true);
-        } else if (
-            this.input.keyboard!.checkDown(
-                this.keys_player_one!.left,
-                TIME_CHECK_KEY_PRESSED
-            )
-        ) {
-            this.player_one!.anims.play("jump", false).on(
-                Animations.Events.ANIMATION_COMPLETE,
-                () => {
-                    this.player_one!.anims.play("idle", true);
-                }
-            );
-            this.clothes_player_one.forEach((clothes) => {
-                clothes.playAnimationAll("jump");
-            });
-            this.drawText(
-                "Izquierda",
-                this.player_one_positionX,
-                this.player_one!.y - 100,
-                TIME_TEXT_PLAYER
-            );
-            this.getAnswer(ValueSPS.PIEDRA, true);
-        } else if (
-            this.input.keyboard!.checkDown(
-                this.keys_player_one!.right,
-                TIME_CHECK_KEY_PRESSED
-            )
-        ) {
-            this.player_one!.anims.play("jump", false).on(
-                Animations.Events.ANIMATION_COMPLETE,
-                () => {
-                    this.player_one!.anims.play("idle", true);
-                }
-            );
-            this.clothes_player_one.forEach((clothes) => {
-                clothes.playAnimationAll("jump");
-            });
-            this.drawText(
-                "Derecha",
-                this.player_one_positionX,
-                this.player_one!.y - 100,
-                TIME_TEXT_PLAYER
-            );
-            this.getAnswer(ValueSPS.TIJERA, true);
-        }
+            // this.drawText(
+            //     "Listo",
+            //     this.player_one_positionX,
+            //     this.player_one!.y - 140,
+            //     TIME_TEXT_PLAYER
+            // );            
+        } else
+            if (
+                this.input.keyboard!.checkDown(
+                    this.keys_player_one!.down,
+                    TIME_CHECK_KEY_PRESSED
+                )
+            ) {
+                this.player_one!.anims.play("jump", false).on(
+                    Animations.Events.ANIMATION_COMPLETE,
+                    () => {
+                        this.player_one!.anims.play("idle", true);
+                    }
+                );
+                this.clothes_player_one.forEach((clothes) => {
+                    clothes.playAnimationAll("jump");
+                });
+                this.drawText(
+                    "Listo",
+                    this.player_one_positionX,
+                    this.player_one!.y - 140,
+                    TIME_TEXT_PLAYER
+                );
+                this.getAnswer(ValueSPS.PAPEL, true);
+            } else if (
+                this.input.keyboard!.checkDown(
+                    this.keys_player_one!.left,
+                    TIME_CHECK_KEY_PRESSED
+                )
+            ) {
+                this.player_one!.anims.play("jump", false).on(
+                    Animations.Events.ANIMATION_COMPLETE,
+                    () => {
+                        this.player_one!.anims.play("idle", true);
+                    }
+                );
+                this.clothes_player_one.forEach((clothes) => {
+                    clothes.playAnimationAll("jump");
+                });
+                this.drawText(
+                    "Listo",
+                    this.player_one_positionX,
+                    this.player_one!.y - 140,
+                    TIME_TEXT_PLAYER
+                );
+                this.getAnswer(ValueSPS.PIEDRA, true);
+            } else if (
+                this.input.keyboard!.checkDown(
+                    this.keys_player_one!.right,
+                    TIME_CHECK_KEY_PRESSED
+                )
+            ) {
+                this.player_one!.anims.play("jump", false).on(
+                    Animations.Events.ANIMATION_COMPLETE,
+                    () => {
+                        this.player_one!.anims.play("idle", true);
+                    }
+                );
+                this.clothes_player_one.forEach((clothes) => {
+                    clothes.playAnimationAll("jump");
+                });
+                this.drawText(
+                    "Listo",
+                    this.player_one_positionX,
+                    this.player_one!.y - 140,
+                    TIME_TEXT_PLAYER
+                );
+                this.getAnswer(ValueSPS.TIJERA, true);
+            }
     }
 
     checkPlayerTwoKeys() {
@@ -311,12 +317,12 @@ export class SPS extends Scene {
             this.clothes_player_two.forEach((clothes) => {
                 clothes.playAnimationAll("jump");
             });
-            this.drawText(
-                "Arriba",
-                this.player_two_positionX,
-                this.player_two!.y - 100,
-                TIME_TEXT_PLAYER
-            );
+            // this.drawText(
+            //     "Arriba",
+            //     this.player_two_positionX,
+            //     this.player_two!.y - 140,
+            //     TIME_TEXT_PLAYER
+            // );
         } else if (
             this.input.keyboard!.checkDown(
                 this.keys_player_two!.down,
@@ -333,9 +339,9 @@ export class SPS extends Scene {
                 clothes.playAnimationAll("jump");
             });
             this.drawText(
-                "Abajo",
+                "Listo",
                 this.player_two_positionX,
-                this.player_two!.y - 100,
+                this.player_two!.y - 140,
                 TIME_TEXT_PLAYER
             );
             this.getAnswer(ValueSPS.PAPEL, false);
@@ -355,9 +361,9 @@ export class SPS extends Scene {
                 clothes.playAnimationAll("jump");
             });
             this.drawText(
-                "Izquierda",
+                "Listo",
                 this.player_two_positionX,
-                this.player_two!.y - 100,
+                this.player_two!.y - 140,
                 TIME_TEXT_PLAYER
             );
             this.getAnswer(ValueSPS.PIEDRA, false);
@@ -377,9 +383,9 @@ export class SPS extends Scene {
                 clothes.playAnimationAll("jump");
             });
             this.drawText(
-                "Derecha",
+                "Listo",
                 this.player_two_positionX,
-                this.player_two!.y - 100,
+                this.player_two!.y - 140,
                 TIME_TEXT_PLAYER
             );
             this.getAnswer(ValueSPS.TIJERA, false);
@@ -393,54 +399,84 @@ export class SPS extends Scene {
         if (this.listen_player_two_keys) {
             this.checkPlayerTwoKeys();
         }
-        if( !this.listen_player_one_keys && !this.listen_player_two_keys){
-            this.state = States.EvaluateTurn;
+        if (!this.listen_player_one_keys && !this.listen_player_two_keys) {
+            this.time.delayedCall(1500, () => {
+                this.state = States.EvaluateTurn;
+            });
         }
     }
 
     evaluateResult() {
-        if(this.player_one_values == this.player_two_values){
-
+        if (this.player_one_values != null && this.player_two_values != null) {
+            if (this.player_one_values == this.player_two_values) {
+                this.drawText("Empate", this.half_width, this.half_height, TIME_TEXT_PLAYER);
+            }
+            //Gana el jugador 1
+            if (this.player_one_values == ValueSPS.PAPEL && this.player_two_values == ValueSPS.PIEDRA) {
+                this.score_player_one++;
+            }
+            if (this.player_one_values == ValueSPS.PIEDRA && this.player_two_values == ValueSPS.TIJERA) {
+                this.score_player_one++;
+            }
+            if (this.player_one_values == ValueSPS.TIJERA && this.player_two_values == ValueSPS.PAPEL) {
+                this.score_player_one++;
+            }
+            //Gana el jugador 2
+            if (this.player_two_values == ValueSPS.PAPEL && this.player_one_values == ValueSPS.PIEDRA) {
+                this.score_player_two++;
+            }
+            if (this.player_two_values == ValueSPS.PIEDRA && this.player_one_values == ValueSPS.TIJERA) {
+                this.score_player_two++;
+            }
+            if (this.player_two_values == ValueSPS.TIJERA && this.player_one_values == ValueSPS.PAPEL) {
+                this.score_player_two++;
+            }
+            this.restartValues();
+            this.redrawTextPoints();
+            
+            this.time.delayedCall(500, () => {
+                console.log("Estado: " + this.state + " " + States[this.state]);
+                this.state = States.PostEvaluateTurn;
+                console.log("Estado: " + this.state + " " + States[this.state]);
+            });
+            
+            this.turn_to_critical++;
+            console.log("turno para critico: " + this.turn_to_critical);
         }
-        //Gana el jugador 1
-        if(this.player_one_values == ValueSPS.PAPEL && this.player_two_values == ValueSPS.PIEDRA){
-            this.score_player_one ++;
-        }
-        if(this.player_one_values == ValueSPS.PIEDRA && this.player_two_values == ValueSPS.TIJERA){
-            this.score_player_one ++;
-        }
-        if(this.player_one_values == ValueSPS.TIJERA && this.player_two_values == ValueSPS.PAPEL){
-            this.score_player_one ++;
-        }
-        //Gana el jugador 2
-        if(this.player_two_values == ValueSPS.PAPEL && this.player_one_values == ValueSPS.PIEDRA){
-            this.score_player_two ++;
-        }
-        if(this.player_two_values == ValueSPS.PIEDRA && this.player_one_values == ValueSPS.TIJERA){
-            this.score_player_two ++;
-        }
-        if(this.player_two_values == ValueSPS.TIJERA && this.player_one_values == ValueSPS.PAPEL){
-            this.score_player_two ++;
-        }
-        this.redrawTextPoints();
-        this.state = States.PostEvaluateTurn;
     }
 
-    postEvaluate(){
-        if( (this.score_player_one  % 3 ==0) || (this.score_player_two % 3 == 0) ){
-            this.state = States.CriticalTurn;
-        }else {
-            this.state = States.PlayersElection;
-        }
+    restartValues() {
+        this.player_one_values = null;
+        this.player_two_values = null;
     }
 
-    criticalTurn(){
+    postEvaluate() {
+        if (this.turn_to_critical == 3) {
+            this.turn_to_critical = 0;
+            console.log("Entro a critico");
+            this.time.delayedCall(500, () => {
+                console.log("Estado: " + this.state + " " + States[this.state]);
+                this.state = States.CriticalTurn;
+                console.log("Estado: " + this.state + " " + States[this.state]);
+            });            
+        } else {
+            console.log("Entro a elegir nuevamente");
+            this.time.delayedCall(500, () => {
+                console.log("Estado: " + this.state + " " + States[this.state]);
+                this.state = States.PlayersElection;
+                console.log("Estado: " + this.state + " " + States[this.state]);
+            });            
+        }
+
+    }
+
+    criticalTurn() {
         this.time.delayedCall(1000, () => {
-            this.state = States.PlayersElection;            
+            this.state = States.PlayersElection;
         });
     }
 
-    gameOver() {}
+    gameOver() { }
 
     drawPermanentText(text: string, x: number, y: number) {
         const text_object = this.add.text(x, y, text, {

@@ -142,17 +142,20 @@ export default function () {
     const botonPlay: Variants = {
         normal: {
             border: "none",
+            borderRadius:"10px",
             background: "#D4B20B",
             padding: "10px",
             margin: "5px",
             fontSize: "0.75em",
             alignSelf: "flex-end",
         },
-    };
-
-    const anclarFondo : Variants ={
-        normal : {
-            alignSelf: "flex-end",
+        hover:{
+            background: "#DCD38D",
+            transition: {
+                duration: 0.2,
+                type: "tween",
+                ease: "linear"
+            }
         }
     };
 
@@ -167,7 +170,7 @@ export default function () {
                         {controles.J1.abajo!="undefined"?<Elemento>{IconosControles[controles.J1.abajo as KeyIconos]} Abajo</Elemento>:<></>}
                         {controles.J1.izquierda!="undefined"?<Elemento>{IconosControles[controles.J1.izquierda as KeyIconos]} Izquierda</Elemento>:<></>}
                         {controles.J1.derecha!="undefined"?<Elemento>{IconosControles[controles.J1.derecha as KeyIconos]} Derecha</Elemento>:<></>}
-                        {controles.J1.choose!="undefined"?<Elemento>{IconosControles[controles.J1.choose as KeyIconos]} Escoger</Elemento>:<></>}
+                        {controles.J1.choose!="undefined"?<Elemento>{IconosControles[controles.J1.choose as KeyIconos]} Aceptar</Elemento>:<></>}
                     </Column>
                     <div
                         style={{
@@ -183,11 +186,11 @@ export default function () {
                         {controles.J2.abajo!="undefined"?<Elemento>{IconosControles[controles.J2.abajo as KeyIconos]} Abajo</Elemento>:<></>}
                         {controles.J2.izquierda!="undefined"?<Elemento>{IconosControles[controles.J2.izquierda as KeyIconos]} Izquierda</Elemento>:<></>}
                         {controles.J2.derecha!="undefined"?<Elemento>{IconosControles[controles.J2.derecha as KeyIconos]} Derecha</Elemento>:<></>}
-                        {controles.J2.choose!="undefined"?<Elemento>{IconosControles[controles.J2.choose as KeyIconos]} Escoger</Elemento>:<></>}
+                        {controles.J2.choose!="undefined"?<Elemento>{IconosControles[controles.J2.choose as KeyIconos]} Aceptar</Elemento>:<></>}
                     </Column>
                 </RowCenter>
-                <RowCenter variants={anclarFondo}>
-                    <motion.button variants={botonPlay}>Play</motion.button>
+                <RowCenter>
+                    <motion.button whileHover="hover" variants={botonPlay}>Continuar</motion.button>
                 </RowCenter>
             </motion.div>
         </Container>

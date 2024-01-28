@@ -1,6 +1,5 @@
 import { Variants, motion } from "framer-motion";
 import { PropsWithChildren } from "react";
-import "./PrimaryButton.css";
 
 export default function PrimaryButton({
     children: label,

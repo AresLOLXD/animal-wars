@@ -32,6 +32,10 @@ enum States {
     ListeningFirstCriticalTurn,
     ListeningSecondCriticalTurn,
     EvaluateCriticalTurn,
+    AnimatingAttackP1,
+    AnimatingAttackP2,
+    Animating,
+    CheckingEnd,
     GameOver,
 }
 
@@ -57,7 +61,6 @@ export class SimonSays extends Scene {
 
     player_one_positionX: number = 0;
     player_two_positionX: number = 0;
-
     state: States = States.Beginning;
     simonSaysValues: ValueSimon[] = [];
 
@@ -128,10 +131,10 @@ export class SimonSays extends Scene {
         this.simon = new Simon(
             this,
             this.half_width,
-            this.half_height - 200,
+            this.half_height - 150,
             "panda"
         );
-        this.simon.setScale(SCALE_FACTOR * 1.2);
+        this.simon.setScale(SCALE_FACTOR * .8);
 
         this.keys_player_one = this.input.keyboard!.addKeys({
             up: Input.Keyboard.KeyCodes.W,
@@ -216,6 +219,8 @@ export class SimonSays extends Scene {
                 ),
             ]),
         ];
+
+        
     }
 
     redrawTextPoints() {
@@ -247,6 +252,7 @@ export class SimonSays extends Scene {
             this.player_two_positionX,
             this.player_two!.y - 80
         );
+        
     }
 
     update() {
@@ -287,6 +293,15 @@ export class SimonSays extends Scene {
             case States.EvaluateCriticalTurn:
                 console.log("Evaluando turno critico");
                 this.evaluateCriticalTurn();
+                break;
+            case States.AnimatingAttackP1:
+                this.animateAttackP1();
+                break;
+            case States.AnimatingAttackP2:
+                this.animateAttackP2();
+                break;
+            case States.CheckingEnd:
+                this.checkingEnd();
                 break;
         }
     }
@@ -392,45 +407,12 @@ export class SimonSays extends Scene {
 
     evaluateCriticalTurn() {
         if (this.start_player_one) {
-            this.evaluateBarResultPlayerOne();
-            this.checkGameOver();
-            if (this.state === States.GameOver) {
-                return;
-            }
-            this.evaluateBarResultPlayerTwo();
+            this.state = States.AnimatingAttackP1;
         } else {
-            this.evaluateBarResultPlayerTwo();
-            this.checkGameOver();
-            if (this.state === States.GameOver) {
-                return;
-            }
-            this.evaluateBarResultPlayerOne();
-        }
-        this.state = States.SimonTurn;
-        this.total_time_player_one = 0;
-        this.total_time_player_two = 0;
-        this.player_one_barUsed = false;
-        this.player_two_barUsed = false;
-        this.checkGameOver();
-    }
-    evaluateBarResultPlayerOne() {
-        if (this.player_one_result_bar === BarResult.Acierto) {
-            //TODO:Agregar animacion de quitar ropa
-            this.removeOneGarmentPlayerTwo();
-        } else if (this.player_one_result_bar === BarResult.Critico) {
-            //TODO:Agregar animacion de quitar ropa a uno mismo P1
-            this.removeOneGarmentPlayerTwo();
+            this.state = States.AnimatingAttackP2;
         }
     }
-    evaluateBarResultPlayerTwo() {
-        if (this.player_two_result_bar === BarResult.Acierto) {
-            //TODO:Agregar animacion de quitar ropa
-            this.removeOneGarmentPlayerOne();
-        } else if (this.player_two_result_bar === BarResult.Critico) {
-            //TODO:Agregar animacion de quitar ropa a uno mismo P2
-            this.removeOneGarmentPlayerOne();
-        }
-    }
+
     playerTurn() {
         this.state = States.ListeningPlayer;
         this.player_one_values = [];
@@ -928,12 +910,12 @@ export class SimonSays extends Scene {
         if (this.start_player_one) {
             console.log("Inicia el p1");
             this.drawText(
-                `Presiona cualquier tecla para detener la barra ${getStore<string>(
+                `       ${getStore<string>(
                     "p1Name"
-                )}`,
+                )} \nPresiona cualquier tecla\n para detener la barra`,
                 this.half_width,
                 this.half_height,
-                1000
+                3000
             );
             setStore("timerTiempoMaximo", 5000);
             setStore("timerState", TimerState.Start);
@@ -966,12 +948,12 @@ export class SimonSays extends Scene {
         } else {
             console.log("Inicia el p2");
             this.drawText(
-                `Presiona cualquier tecla para detener la barra ${getStore<string>(
+                `        ${getStore<string>(
                     "p2Name"
-                )}`,
+                )} \nPresiona cualquier tecla\n para detener la barra`,
                 this.half_width,
                 this.half_height,
-                1000
+                3000
             );
             setStore("timerTiempoMaximo", 5000);
             setStore("timerState", TimerState.Start);
@@ -1066,5 +1048,172 @@ export class SimonSays extends Scene {
         this.time.delayedCall(time, () => {
             text.destroy();
         });
+    }
+
+    animateAttackP1(){
+        this.state = States.Animating;
+        /*if (this.start_player_one) {
+            this.state = States.AnimatingAttackP1;
+        } else {
+            this.state = States.AnimatingAttackP2;
+        }*/
+        if (this.player_one_result_bar === BarResult.Acierto) {
+            //TODO:Agregar animacion de quitar ropa
+            this.removeOneGarmentPlayerTwo();
+            if(this.start_player_one){
+                this.animarPayBomba(States.AnimatingAttackP2, true);
+            }
+            else{
+                this.animarPayBomba(States.CheckingEnd, true);
+            }
+        } else if (this.player_one_result_bar === BarResult.Critico) {
+            //TODO:Agregar animacion de quitar ropa a uno mismo P1
+            this.removeOneGarmentPlayerOne();
+            if(this.start_player_one){
+                this.animarPayNuclear(States.AnimatingAttackP2, true);
+            }
+            else{
+                this.animarPayNuclear(States.CheckingEnd, true);
+            }
+        }
+        else{
+            if(this.start_player_one){
+                this.animarPayFake(States.AnimatingAttackP2);
+            }
+            else{
+                this.animarPayFake(States.CheckingEnd);
+            }
+        }
+    }
+
+    animateAttackP2(){
+        this.state = States.Animating;
+        if (this.player_two_result_bar === BarResult.Acierto) {
+            //TODO:Agregar animacion de quitar ropa
+            this.removeOneGarmentPlayerOne();
+            if(this.start_player_one){
+                this.animarPayBomba(States.CheckingEnd, false);
+            }
+            else{
+                this.animarPayBomba(States.AnimatingAttackP1, false);
+            }
+        } else if (this.player_two_result_bar === BarResult.Critico) {
+            //TODO:Agregar animacion de quitar ropa a uno mismo P2
+            this.removeOneGarmentPlayerTwo();
+            if(this.start_player_one){
+                this.animarPayNuclear(States.CheckingEnd, false);
+            }
+            else{
+                this.animarPayNuclear(States.AnimatingAttackP1, false);
+            }
+        }
+        else{
+            if(this.start_player_one){
+                this.animarPayFake(States.CheckingEnd);
+            }
+            else{
+                this.animarPayFake(States.AnimatingAttackP1);
+            }
+            
+        }
+    }
+
+    checkingEnd(){
+        this.total_time_player_one = 0;
+        this.total_time_player_two = 0;
+        this.player_one_barUsed = false;
+        this.player_two_barUsed = false;
+        this.state = States.SimonTurn;
+        this.checkGameOver();
+    }
+
+    animarPayFake(state : States){
+        let payFake1 = new Pay(this, 100, this.half_height+40, "pays");
+        payFake1.setScale(SCALE_FACTOR * 1);
+
+        let payFake2 = new Pay(this, this.width-100, this.half_height+40, "pays");
+        payFake2.setScale(SCALE_FACTOR * 1);
+
+        payFake1.anims.play("pay_fake", false)
+
+        payFake2.anims.play("pay_fake", false).on(
+            Animations.Events.ANIMATION_COMPLETE,
+            () => {
+                console.log("Finalizo la animacion");
+                payFake1.destroy();
+                payFake2.destroy();
+                this.state = state;
+            }
+        );
+    }
+
+    animarPayNuclear(state : States, isPlayerOne: boolean){
+        let payFake;
+        let payNuc;
+        if(isPlayerOne){
+            payNuc = new Pay(this, 100, this.half_height+40, "pays");   
+            payFake = new Pay(this, this.width-100, this.half_height+40, "pays");
+        }
+        else{
+            payFake = new Pay(this, 100, this.half_height+40, "pays");   
+            payNuc = new Pay(this, this.width-100, this.half_height+40, "pays");
+        }
+
+
+
+        payNuc.anims.play("pay_nuc", false).on(
+            Animations.Events.ANIMATION_COMPLETE,
+            () => {
+                console.log("Finalizo la animacion de bomba");
+                payNuc.destroy();
+                this.checkGameOver();
+                if(this.state != States.GameOver){
+                    this.state = state;
+                }
+            }
+        );
+
+        payFake.anims.play("pay_fake", false).on(
+            Animations.Events.ANIMATION_COMPLETE,
+            () => {
+                console.log("Finalizo la animacion");
+                payFake.destroy();
+            }
+        );
+    }
+
+    animarPayBomba(state : States, isPlayerOne: boolean){
+        let payFake;
+        let payBomba;
+        if(isPlayerOne){
+            payFake = new Pay(this, 100, this.half_height+40, "pays");   
+            payBomba = new Pay(this, this.width-100, this.half_height+40, "pays");
+        }
+        else{
+            payBomba = new Pay(this, 100, this.half_height+40, "pays");   
+            payFake = new Pay(this, this.width-100, this.half_height+40, "pays");
+        }
+
+
+
+        payBomba.anims.play("pay_exp", false).on(
+            Animations.Events.ANIMATION_COMPLETE,
+            () => {
+                console.log("Finalizo la animacion de bomba");
+                payBomba.destroy();
+                this.checkGameOver();
+                if(this.state != States.GameOver){
+                    this.state = state;
+                }
+            }
+        );
+
+        payFake.anims.play("pay_fake", false).on(
+            Animations.Events.ANIMATION_COMPLETE,
+            () => {
+                console.log("Finalizo la animacion");
+                payFake.destroy();
+            }
+        );
     }
 }
